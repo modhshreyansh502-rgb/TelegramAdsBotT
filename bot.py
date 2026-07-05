@@ -395,8 +395,8 @@ def normalize_phone_number(raw: str) -> tuple:
 
 def normalize_otp(raw: str) -> tuple:
     """
-    Normalize OTP — accept ANY format.
-    Extracts only digits. Works with:
+    Normalize OTP and accept any common format.
+    Converts the input to plain ASCII digits. Works with:
     - 12345
     - 1 2 3 4 5
     - 1-2-3-4-5
@@ -409,11 +409,17 @@ def normalize_otp(raw: str) -> tuple:
     if not raw:
         return None, "❌ Please send the OTP."
 
-    # Extract ONLY digits from raw text
-    digits = ""
-    for ch in raw:
+    # Extract digits from any pasted format and normalize them to ASCII.
+    # This makes both "11111" and "1 1 1 1 1" behave exactly the same.
+    import unicodedata
+    digits_list = []
+    for ch in str(raw).strip():
         if ch.isdigit():
-            digits += ch
+            try:
+                digits_list.append(str(unicodedata.digit(ch)))
+            except (TypeError, ValueError):
+                digits_list.append(ch)
+    digits = "".join(digits_list)
 
     if not digits:
         return None, (
@@ -430,14 +436,14 @@ def normalize_otp(raw: str) -> tuple:
         return None, (
             f"❌ <b>OTP too short!</b>\n\n"
             f"Got only <code>{len(digits)}</code> digits: <code>{digits}</code>\n"
-            f"OTP should be 5-6 digits."
+            f"OTP should usually be 4-8 digits."
         )
 
     if len(digits) > 8:
         return None, (
             f"❌ <b>OTP too long!</b>\n\n"
             f"Got <code>{len(digits)}</code> digits.\n"
-            f"OTP should be 5-6 digits.\n"
+            f"OTP should usually be 4-8 digits.\n"
             f"Send only the OTP, nothing else."
         )
 
