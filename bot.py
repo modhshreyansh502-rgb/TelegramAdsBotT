@@ -1,4 +1,4 @@
-﻿
+
 import asyncio
 import time
 import math
@@ -9,15 +9,15 @@ import traceback
 import logging
 from datetime import datetime, timedelta
 
-# â”€â”€ Setup Logging â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Setup Logging ─────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
 )
-logger = logging.getLogger("SkullAdsBot")
+logger = logging.getLogger("MarketingBot")
 
-# â”€â”€ Event Loop Fix â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Event Loop Fix ────────────────────────────────────
 try:
     loop = asyncio.get_event_loop()
     if loop.is_closed():
@@ -27,7 +27,7 @@ except RuntimeError:
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
-# â”€â”€ Pyrogram Imports â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Pyrogram Imports ──────────────────────────────────
 try:
     from pyrogram import Client, filters, idle
     from pyrogram.types import (
@@ -46,7 +46,7 @@ except ImportError:
     logger.error("Pyrogram not installed! Run: pip install pyrogram tgcrypto")
     sys.exit(1)
 
-# â”€â”€ Phone Number Validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Phone Number Validation ───────────────────────────
 try:
     import phonenumbers
     from phonenumbers import NumberParseException
@@ -56,7 +56,7 @@ except ImportError:
     PHONENUMBERS_AVAILABLE = False
     logger.warning("phonenumbers not installed. Basic validation only. Run: pip install phonenumbers")
 
-# â”€â”€ DNS Bypass â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── DNS Bypass ────────────────────────────────────────
 try:
     import dns.resolver
     dns.resolver.default_resolver = dns.resolver.Resolver(configure=False)
@@ -69,7 +69,7 @@ except Exception as e:
 
 
 # =====================================================
-# âš™ï¸ CONFIGURATION â€” Load from Environment Variables
+# ⚙️ CONFIGURATION — Load from Environment Variables
 # =====================================================
 API_ID = int(os.getenv("API_ID", "38010847"))
 API_HASH = os.getenv("API_HASH", "0c7305952c10ae2ac8b61c9546777fcb")
@@ -89,14 +89,14 @@ if _missing:
     logger.critical(f"Missing required environment variables: {', '.join(_missing)}")
     sys.exit(1)
 
-BOT_USERNAME = "SkullAdsBot"
+BOT_USERNAME = "MarketingBot"
 BOT_VERSION = "3.0"
 BOT_START_TIME = time.time()
 
-# â”€â”€ Plan Configuration â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Plan Configuration ────────────────────────────────
 PLANS = {
     "free": {
-        "name": "ðŸ†“ Free",
+        "name": "🆓 Free",
         "accounts": 1,
         "price": "Free",
         "max_targets": 50,
@@ -104,25 +104,25 @@ PLANS = {
         "priority": 0
     },
     "basic": {
-        "name": "âš¡ Basic",
+        "name": "⚡ Basic",
         "accounts": 3,
-        "price": "â‚¹99/month",
+        "price": "₹99/month",
         "max_targets": 200,
         "max_rounds": 50,
         "priority": 1
     },
     "pro": {
-        "name": "ðŸ’Ž Pro",
+        "name": "💎 Pro",
         "accounts": 10,
-        "price": "â‚¹249/month",
+        "price": "₹249/month",
         "max_targets": 1000,
         "max_rounds": 500,
         "priority": 2
     },
     "elite": {
-        "name": "ðŸ‘‘ Elite",
+        "name": "👑 Elite",
         "accounts": 999,
-        "price": "â‚¹499/month",
+        "price": "₹499/month",
         "max_targets": 99999,
         "max_rounds": 99999,
         "priority": 3
@@ -131,9 +131,9 @@ PLANS = {
 
 FREE_ACCOUNT_LIMIT = 1
 
-# â”€â”€ Bot Client â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Bot Client ────────────────────────────────────────
 bot = Client(
-    "SkullAdsBot",
+    "MarketingBot",
     api_id=API_ID,
     api_hash=API_HASH,
     bot_token=BOT_TOKEN,
@@ -142,7 +142,7 @@ bot = Client(
 
 
 # =====================================================
-# ðŸ’¾ JSON STORAGE ENGINE â€” Thread-Safe
+# 💾 JSON STORAGE ENGINE — Thread-Safe
 # =====================================================
 DATA_FILE = "data.json"
 DATA_LOCK = asyncio.Lock()
@@ -290,7 +290,7 @@ async def async_update_data(data: dict) -> bool:
 
 
 # =====================================================
-# ðŸ› ï¸ GLOBAL STATE MANAGEMENT
+# 🛠️ GLOBAL STATE MANAGEMENT
 # =====================================================
 user_state = {}
 active_tasks = {}
@@ -299,10 +299,10 @@ command_cooldowns = {}
 
 
 # =====================================================
-# ðŸ“± PHONE NUMBER & OTP HELPERS
+# 📱 PHONE NUMBER & OTP HELPERS
 # =====================================================
 # =====================================================
-# ðŸ“± PHONE NUMBER & OTP HELPERS â€” BULLETPROOF
+# 📱 PHONE NUMBER & OTP HELPERS — BULLETPROOF
 # =====================================================
 def normalize_phone_number(raw: str) -> tuple:
     """
@@ -311,7 +311,7 @@ def normalize_phone_number(raw: str) -> tuple:
     normalized_number is None if invalid.
     """
     if not raw:
-        return None, "âŒ Please send your phone number."
+        return None, "❌ Please send your phone number."
 
     cleaned = raw.strip()
 
@@ -345,28 +345,28 @@ def normalize_phone_number(raw: str) -> tuple:
 
             if parsed is None:
                 return None, (
-                    "âŒ <b>Cannot parse phone number!</b>\n\n"
-                    "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                    "â”‚ Please send with country code.\n"
-                    "â”‚\n"
-                    "â”‚ <b>Examples:</b>\n"
-                    "â”‚ â€¢ <code>+919876543210</code>\n"
-                    "â”‚ â€¢ <code>919876543210</code>\n"
-                    "â”‚ â€¢ <code>9876543210</code>\n"
-                    "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+                    "❌ <b>Cannot parse phone number!</b>\n\n"
+                    "┌─────────────────────\n"
+                    "│ Please send with country code.\n"
+                    "│\n"
+                    "│ <b>Examples:</b>\n"
+                    "│ • <code>+919876543210</code>\n"
+                    "│ • <code>919876543210</code>\n"
+                    "│ • <code>9876543210</code>\n"
+                    "└─────────────────────"
                 )
 
             if not phonenumbers.is_valid_number(parsed):
                 return None, (
-                    "âŒ <b>Invalid phone number!</b>\n\n"
-                    "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                    "â”‚ Number doesn't seem valid.\n"
-                    "â”‚ Check and try again.\n"
-                    "â”‚\n"
-                    "â”‚ <b>Examples:</b>\n"
-                    "â”‚ â€¢ <code>+919876543210</code>\n"
-                    "â”‚ â€¢ <code>919876543210</code>\n"
-                    "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+                    "❌ <b>Invalid phone number!</b>\n\n"
+                    "┌─────────────────────\n"
+                    "│ Number doesn't seem valid.\n"
+                    "│ Check and try again.\n"
+                    "│\n"
+                    "│ <b>Examples:</b>\n"
+                    "│ • <code>+919876543210</code>\n"
+                    "│ • <code>919876543210</code>\n"
+                    "└─────────────────────"
                 )
 
             e164 = phonenumbers.format_number(
@@ -384,7 +384,7 @@ def normalize_phone_number(raw: str) -> tuple:
 
     if len(digits_only) < 7 or len(digits_only) > 15:
         return None, (
-            "âŒ <b>Invalid phone number!</b>\n\n"
+            "❌ <b>Invalid phone number!</b>\n\n"
             "Include country code.\n"
             "Example: <code>+919876543210</code>"
         )
@@ -395,7 +395,7 @@ def normalize_phone_number(raw: str) -> tuple:
 
 def normalize_otp(raw: str) -> tuple:
     """
-    Normalize OTP â€” accept ANY format.
+    Normalize OTP — accept ANY format.
     Extracts only digits. Works with:
     - 12345
     - 1 2 3 4 5
@@ -407,7 +407,7 @@ def normalize_otp(raw: str) -> tuple:
     Returns (otp_digits, error_message)
     """
     if not raw:
-        return None, "âŒ Please send the OTP."
+        return None, "❌ Please send the OTP."
 
     # Extract ONLY digits from raw text
     digits = ""
@@ -417,25 +417,25 @@ def normalize_otp(raw: str) -> tuple:
 
     if not digits:
         return None, (
-            "âŒ <b>No digits found in OTP!</b>\n\n"
-            "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            "â”‚ Just send the OTP digits:\n"
-            "â”‚ â€¢ <code>12345</code>\n"
-            "â”‚ â€¢ <code>1 2 3 4 5</code>\n"
-            "â”‚ â€¢ <code>1-2-3-4-5</code>\n"
-            "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+            "❌ <b>No digits found in OTP!</b>\n\n"
+            "┌─────────────────────\n"
+            "│ Just send the OTP digits:\n"
+            "│ • <code>12345</code>\n"
+            "│ • <code>1 2 3 4 5</code>\n"
+            "│ • <code>1-2-3-4-5</code>\n"
+            "└─────────────────────"
         )
 
     if len(digits) < 4:
         return None, (
-            f"âŒ <b>OTP too short!</b>\n\n"
+            f"❌ <b>OTP too short!</b>\n\n"
             f"Got only <code>{len(digits)}</code> digits: <code>{digits}</code>\n"
             f"OTP should be 5-6 digits."
         )
 
     if len(digits) > 8:
         return None, (
-            f"âŒ <b>OTP too long!</b>\n\n"
+            f"❌ <b>OTP too long!</b>\n\n"
             f"Got <code>{len(digits)}</code> digits.\n"
             f"OTP should be 5-6 digits.\n"
             f"Send only the OTP, nothing else."
@@ -444,7 +444,7 @@ def normalize_otp(raw: str) -> tuple:
     return digits, None
 
 # =====================================================
-# ðŸ› ï¸ HELPER FUNCTIONS
+# 🛠️ HELPER FUNCTIONS
 # =====================================================
 def get_readable_time(seconds: int) -> str:
     """Convert seconds to human-readable time string."""
@@ -529,9 +529,9 @@ def get_user_plan_key(user_id: int) -> str:
 def get_user_plan_name(user_id: int) -> str:
     """Get user's plan display name."""
     if is_admin(user_id):
-        return "ðŸ‘‘ Admin"
+        return "👑 Admin"
     plan_key = get_user_plan_key(user_id)
-    return PLANS.get(plan_key, PLANS["free"]).get("name", "ðŸ†“ Free")
+    return PLANS.get(plan_key, PLANS["free"]).get("name", "🆓 Free")
 
 
 def get_user_plan_info(user_id: int) -> dict:
@@ -597,11 +597,11 @@ async def check_access(user_id: int, msg_or_query) -> bool:
     banned = data.get("banned_users", [])
     if user_id in banned:
         msg = (
-            "ðŸ’€ <b>Access Denied!</b>\n\n"
-            "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            "â”‚ ðŸš« You are <b>permanently banned</b>.\n"
-            "â”‚ Contact @securedsitedns for support.\n"
-            "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+            "💀 <b>Access Denied!</b>\n\n"
+            "┌─────────────────────\n"
+            "│ 🚫 You are <b>permanently banned</b>.\n"
+            "│ Contact @securedsitedns for support.\n"
+            "└─────────────────────"
         )
         try:
             if isinstance(msg_or_query, CallbackQuery):
@@ -615,12 +615,12 @@ async def check_access(user_id: int, msg_or_query) -> bool:
     # Check maintenance
     if data["settings"].get("maintenance_mode", False):
         msg = (
-            "ðŸ”§ <b>Under Maintenance!</b>\n\n"
-            "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            "â”‚ âš™ï¸ Bot is being upgraded.\n"
-            "â”‚ Please try again later.\n"
-            "â”‚ Contact @securedsitedns for info.\n"
-            "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+            "🔧 <b>Under Maintenance!</b>\n\n"
+            "┌─────────────────────\n"
+            "│ ⚙️ Bot is being upgraded.\n"
+            "│ Please try again later.\n"
+            "│ Contact @securedsitedns for info.\n"
+            "└─────────────────────"
         )
         try:
             if isinstance(msg_or_query, CallbackQuery):
@@ -631,7 +631,7 @@ async def check_access(user_id: int, msg_or_query) -> bool:
             logger.debug(f"check_access maintenance reply error: {e}")
         return False
 
-    # Check force join channel â€” proper error handling
+    # Check force join channel — proper error handling
     force_channel = data["settings"].get("force_join_channel", "")
     if force_channel:
         try:
@@ -639,11 +639,11 @@ async def check_access(user_id: int, msg_or_query) -> bool:
             # User is banned from channel
             if member.status == ChatMemberStatus.BANNED:
                 msg = (
-                    "ðŸ’€ <b>Access Restricted!</b>\n\n"
-                    "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                    f"â”‚ ðŸš« You are banned in our channel.\n"
-                    f"â”‚ Contact @securedsitedns for help.\n"
-                    "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+                    "💀 <b>Access Restricted!</b>\n\n"
+                    "┌─────────────────────\n"
+                    f"│ 🚫 You are banned in our channel.\n"
+                    f"│ Contact @securedsitedns for help.\n"
+                    "└─────────────────────"
                 )
                 try:
                     if isinstance(msg_or_query, CallbackQuery):
@@ -659,18 +659,18 @@ async def check_access(user_id: int, msg_or_query) -> bool:
         except UserNotParticipant:
             # User genuinely not in channel
             msg = (
-                "ðŸ’€ <b>Join Required!</b>\n\n"
-                "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                f"â”‚ ðŸ“¢ Join our channel first:\n"
-                f"â”‚ {force_channel}\n"
-                "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+                "💀 <b>Join Required!</b>\n\n"
+                "┌─────────────────────\n"
+                f"│ 📢 Join our channel first:\n"
+                f"│ {force_channel}\n"
+                "└─────────────────────"
             )
             markup = InlineKeyboardMarkup([
                 [InlineKeyboardButton(
-                    "ðŸ“¢ Join Channel",
+                    "📢 Join Channel",
                     url=f"https://t.me/{force_channel.replace('@', '')}"
                 )],
-                [InlineKeyboardButton("âœ… I Joined", callback_data="check_join")]
+                [InlineKeyboardButton("✅ I Joined", callback_data="check_join")]
             ])
             try:
                 if isinstance(msg_or_query, CallbackQuery):
@@ -685,14 +685,14 @@ async def check_access(user_id: int, msg_or_query) -> bool:
                 logger.debug(f"Force join message error: {e}")
             return False
         except (ChannelPrivate, PeerIdInvalid) as e:
-            # Channel config error â€” don't block user, log admin warning
+            # Channel config error — don't block user, log admin warning
             logger.warning(
                 f"Force join channel '{force_channel}' config error: {e}. "
                 f"Check bot is admin in channel."
             )
             return True
         except Exception as e:
-            # Other API errors â€” log but don't block user
+            # Other API errors — log but don't block user
             logger.warning(f"Force join check error for user {user_id}: {e}")
             return True
 
@@ -724,7 +724,7 @@ async def safe_send(user_id: int, text: str, markup=None):
 
 
 # =====================================================
-# ðŸ  START & WELCOME
+# 🏠 START & WELCOME
 # =====================================================
 @bot.on_message(filters.command("start") & filters.private)
 async def start_cmd(client, message: Message):
@@ -782,15 +782,15 @@ async def start_cmd(client, message: Message):
                 )
                 await bot.send_message(
                     admin_id,
-                    f"ðŸ’€ <b>New User Joined!</b>\n\n"
-                    f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                    f"â”‚ ðŸ‘¤ <b>Name:</b> {sanitize_html(message.from_user.first_name or 'Unknown')}\n"
-                    f"â”‚ ðŸ†” <b>ID:</b> <code>{u_id}</code>\n"
-                    f"â”‚ ðŸ”— <b>Username:</b> {uname}\n"
-                    f"â”‚ ðŸŒ <b>Lang:</b> {message.from_user.language_code or 'N/A'}\n"
-                    f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                    f"â”‚ ðŸ“ˆ <b>Total Users:</b> <code>{total_users}</code>\n"
-                    f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+                    f"💀 <b>New User Joined!</b>\n\n"
+                    f"┌─────────────────────\n"
+                    f"│ 👤 <b>Name:</b> {sanitize_html(message.from_user.first_name or 'Unknown')}\n"
+                    f"│ 🆔 <b>ID:</b> <code>{u_id}</code>\n"
+                    f"│ 🔗 <b>Username:</b> {uname}\n"
+                    f"│ 🌐 <b>Lang:</b> {message.from_user.language_code or 'N/A'}\n"
+                    f"├─────────────────────\n"
+                    f"│ 📈 <b>Total Users:</b> <code>{total_users}</code>\n"
+                    f"└─────────────────────",
                     parse_mode=ParseMode.HTML
                 )
             except Exception as e:
@@ -809,40 +809,40 @@ async def send_welcome(msg_or_query, is_edit: bool = False):
     total_users = len(data["users"])
 
     text = (
-        "ðŸ’€ <b>Sá´‹á´œÊŸÊŸ Aá´…s Bá´á´› v3.0</b>\n\n"
-        "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        "â”‚ The most powerful Telegram ad\n"
-        "â”‚ automation tool is now in your hands.\n"
-        "â”‚ Connect â€¢ Target â€¢ Launch\n"
-        "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ‘¥ Users: <code>{total_users}</code> | â±ï¸ Up: <code>{uptime}</code>\n"
-        "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
-        "âš¡ <b>Core Features</b>\n"
-        "â”œ ðŸŽ¯ Smart Group Targeting\n"
-        "â”œ ðŸ”„ Auto Multi-Round Campaigns\n"
-        "â”œ ðŸ›¡ï¸ Anti-Flood Protection\n"
-        "â”œ ðŸ“Š Live Campaign Tracker\n"
-        "â”œ ðŸ‘¥ Multi-Account Support\n"
-        "â”œ ðŸ”‘ OTP & 2FA Secure Login\n"
-        "â”œ ðŸ“ˆ Advanced Analytics\n"
-        "â”” ðŸ”— Referral System\n\n"
-        "ðŸ‘¨â€ðŸ’» <b>Group:</b> @securedsitedns\n"
-        "ðŸ¤– <b>Owner:</b> @securedsitedns"
+        "💀 <b>Sᴋᴜʟʟ Aᴅs Bᴏᴛ v3.0</b>\n\n"
+        "┌─────────────────────\n"
+        "│ The most powerful Telegram ad\n"
+        "│ automation tool is now in your hands.\n"
+        "│ Connect • Target • Launch\n"
+        "├─────────────────────\n"
+        f"│ 👥 Users: <code>{total_users}</code> | ⏱️ Up: <code>{uptime}</code>\n"
+        "└─────────────────────\n\n"
+        "⚡ <b>Core Features</b>\n"
+        "├ 🎯 Smart Group Targeting\n"
+        "├ 🔄 Auto Multi-Round Campaigns\n"
+        "├ 🛡️ Anti-Flood Protection\n"
+        "├ 📊 Live Campaign Tracker\n"
+        "├ 👥 Multi-Account Support\n"
+        "├ 🔑 OTP & 2FA Secure Login\n"
+        "├ 📈 Advanced Analytics\n"
+        "└ 🔗 Referral System\n\n"
+        "👨‍💻 <b>Group:</b> @securedsitedns\n"
+        "🤖 <b>Owner:</b> @securedsitedns"
     )
 
     markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton("ðŸ’» Open Dashboard", callback_data="open_dash")],
+        [InlineKeyboardButton("💻 Open Dashboard", callback_data="open_dash")],
         [
-            InlineKeyboardButton("ðŸ’Ž Premium Plans", callback_data="show_plans"),
-            InlineKeyboardButton("ðŸ“– How To Use", callback_data="how_to_use")
+            InlineKeyboardButton("💎 Premium Plans", callback_data="show_plans"),
+            InlineKeyboardButton("📖 How To Use", callback_data="how_to_use")
         ],
         [
-            InlineKeyboardButton("ðŸ”— Referral Link", callback_data="my_referral"),
-            InlineKeyboardButton("ðŸ“Š Bot Stats", callback_data="public_stats")
+            InlineKeyboardButton("🔗 Referral Link", callback_data="my_referral"),
+            InlineKeyboardButton("📊 Bot Stats", callback_data="public_stats")
         ],
         [
-            InlineKeyboardButton("ðŸ’¬ Support", url="https://t.me/securedsitedns"),
-            InlineKeyboardButton("ðŸ¤– Owner", url="https://t.me/securedsitedns")
+            InlineKeyboardButton("💬 Support", url="https://t.me/securedsitedns"),
+            InlineKeyboardButton("🤖 Owner", url="https://t.me/securedsitedns")
         ]
     ])
 
@@ -857,16 +857,16 @@ async def send_welcome(msg_or_query, is_edit: bool = False):
         logger.warning(f"Welcome send error: {e}")
 
 
-# â”€â”€ Check Force Join â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Check Force Join ──────────────────────────────────
 @bot.on_callback_query(filters.regex("^check_join$"))
 async def check_join_cb(client, query: CallbackQuery):
     u_id = query.from_user.id
     if await check_access(u_id, query):
-        await query.answer("âœ… Verified! Welcome!", show_alert=True)
+        await query.answer("✅ Verified! Welcome!", show_alert=True)
         await send_welcome(query.message, is_edit=True)
 
 
-# â”€â”€ Back to Start â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Back to Start ─────────────────────────────────────
 @bot.on_callback_query(filters.regex("^back_start$"))
 async def back_start_cb(client, query: CallbackQuery):
     if not await check_access(query.from_user.id, query):
@@ -884,56 +884,56 @@ async def back_start_cb(client, query: CallbackQuery):
     await send_welcome(query.message, is_edit=True)
 
 
-# â”€â”€ How To Use â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── How To Use ────────────────────────────────────────
 @bot.on_callback_query(filters.regex("^how_to_use$"))
 async def how_to_use_cb(client, query: CallbackQuery):
     text = (
-        "ðŸ“– <b>Skull Ads â€” Complete Guide</b>\n\n"
-        "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        "â”‚ <b>ðŸ”° QUICK START GUIDE</b>\n"
-        "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        "â”‚ <b>Step 1:</b> Open Dashboard\n"
-        "â”‚ <b>Step 2:</b> Go to Accounts â†’ Add\n"
-        "â”‚ <b>Step 3:</b> Login with Phone Number\n"
-        "â”‚ <b>Step 4:</b> Select Active Account\n"
-        "â”‚ <b>Step 5:</b> Go to Targets\n"
-        "â”‚ <b>Step 6:</b> Fetch or Add Group Links\n"
-        "â”‚ <b>Step 7:</b> Set your Ad Message\n"
-        "â”‚ <b>Step 8:</b> Configure Settings\n"
-        "â”‚           (Delay â€¢ Interval â€¢ Rounds)\n"
-        "â”‚ <b>Step 9:</b> Hit Launch! ðŸš€\n"
-        "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        "â”‚ <b>âš ï¸ PRO TIPS</b>\n"
-        "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        "â”‚ â€¢ Use <b>10-30s</b> delay to avoid bans\n"
-        "â”‚ â€¢ Set interval <b>60m+</b> for safe cycling\n"
-        "â”‚ â€¢ Use <code>/reset</code> if bot gets stuck\n"
-        "â”‚ â€¢ Free plan = <b>1 account</b> only\n"
-        "â”‚ â€¢ Buy Premium for <b>multi accounts</b>\n"
-        "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        "â”‚ <b>ðŸ“‹ AVAILABLE COMMANDS</b>\n"
-        "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        "â”‚ /start â€” Main menu\n"
-        "â”‚ /ping â€” Check bot status\n"
-        "â”‚ /reset â€” Reset stuck states\n"
-        "â”‚ /cancel â€” Cancel current action\n"
-        "â”‚ /myid â€” Get your user ID\n"
-        "â”‚ /help â€” Show this guide\n"
-        "â”‚ /referral â€” Your referral link\n"
-        "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
-        "ðŸ‘¨â€ðŸ’» <b>Help:</b> @securedsitedns | @securedsitedns"
+        "📖 <b>Skull Ads — Complete Guide</b>\n\n"
+        "┌─────────────────────\n"
+        "│ <b>🔰 QUICK START GUIDE</b>\n"
+        "├─────────────────────\n"
+        "│ <b>Step 1:</b> Open Dashboard\n"
+        "│ <b>Step 2:</b> Go to Accounts → Add\n"
+        "│ <b>Step 3:</b> Login with Phone Number\n"
+        "│ <b>Step 4:</b> Select Active Account\n"
+        "│ <b>Step 5:</b> Go to Targets\n"
+        "│ <b>Step 6:</b> Fetch or Add Group Links\n"
+        "│ <b>Step 7:</b> Set your Ad Message\n"
+        "│ <b>Step 8:</b> Configure Settings\n"
+        "│           (Delay • Interval • Rounds)\n"
+        "│ <b>Step 9:</b> Hit Launch! 🚀\n"
+        "├─────────────────────\n"
+        "│ <b>⚠️ PRO TIPS</b>\n"
+        "├─────────────────────\n"
+        "│ • Use <b>10-30s</b> delay to avoid bans\n"
+        "│ • Set interval <b>60m+</b> for safe cycling\n"
+        "│ • Use <code>/reset</code> if bot gets stuck\n"
+        "│ • Free plan = <b>1 account</b> only\n"
+        "│ • Buy Premium for <b>multi accounts</b>\n"
+        "├─────────────────────\n"
+        "│ <b>📋 AVAILABLE COMMANDS</b>\n"
+        "├─────────────────────\n"
+        "│ /start — Main menu\n"
+        "│ /ping — Check bot status\n"
+        "│ /reset — Reset stuck states\n"
+        "│ /cancel — Cancel current action\n"
+        "│ /myid — Get your user ID\n"
+        "│ /help — Show this guide\n"
+        "│ /referral — Your referral link\n"
+        "└─────────────────────\n\n"
+        "👨‍💻 <b>Help:</b> @securedsitedns | @securedsitedns"
     )
     await safe_edit(
         query.message, text,
         InlineKeyboardMarkup([
-            [InlineKeyboardButton("ðŸ’Ž Buy Premium", callback_data="show_plans")],
-            [InlineKeyboardButton("ðŸ’» Dashboard", callback_data="open_dash")],
-            [InlineKeyboardButton("ðŸ”™ Back", callback_data="back_start")]
+            [InlineKeyboardButton("💎 Buy Premium", callback_data="show_plans")],
+            [InlineKeyboardButton("💻 Dashboard", callback_data="open_dash")],
+            [InlineKeyboardButton("🔙 Back", callback_data="back_start")]
         ])
     )
 
 
-# â”€â”€ My Referral â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── My Referral ───────────────────────────────────────
 @bot.on_callback_query(filters.regex("^my_referral$"))
 async def my_referral_cb(client, query: CallbackQuery):
     u_id = query.from_user.id
@@ -942,28 +942,28 @@ async def my_referral_cb(client, query: CallbackQuery):
     ref_link = f"https://t.me/{BOT_USERNAME}?start=ref_{u_id}"
 
     text = (
-        f"ðŸ’€ <b>Your Referral Link</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ”— <b>Link:</b>\n"
-        f"â”‚ <code>{ref_link}</code>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ‘¥ <b>Total Referrals:</b> <code>{ref_count}</code>\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
+        f"💀 <b>Your Referral Link</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ 🔗 <b>Link:</b>\n"
+        f"│ <code>{ref_link}</code>\n"
+        f"├─────────────────────\n"
+        f"│ 👥 <b>Total Referrals:</b> <code>{ref_count}</code>\n"
+        f"└─────────────────────\n\n"
         f"Share this link and earn rewards!"
     )
     await safe_edit(
         query.message, text,
         InlineKeyboardMarkup([
-            [InlineKeyboardButton("ðŸ“¤ Share Link", url=(
+            [InlineKeyboardButton("📤 Share Link", url=(
                 f"https://t.me/share/url?url={ref_link}"
                 f"&text=Join+Skull+Ads+Bot+for+free!"
             ))],
-            [InlineKeyboardButton("ðŸ”™ Back", callback_data="back_start")]
+            [InlineKeyboardButton("🔙 Back", callback_data="back_start")]
         ])
     )
 
 
-# â”€â”€ Public Stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Public Stats ──────────────────────────────────────
 @bot.on_callback_query(filters.regex("^public_stats$"))
 async def public_stats_cb(client, query: CallbackQuery):
     data = get_data()
@@ -978,25 +978,25 @@ async def public_stats_cb(client, query: CallbackQuery):
     uptime = get_readable_time(int(time.time() - BOT_START_TIME))
 
     text = (
-        f"ðŸ’€ <b>Skull Ads â€” Public Stats</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ‘¥ <b>Total Users:</b> <code>{total_users}</code>\n"
-        f"â”‚ ðŸš€ <b>Messages Sent:</b> <code>{total_sent:,}</code>\n"
-        f"â”‚ ðŸ“Š <b>Campaigns Created:</b> <code>{total_campaigns}</code>\n"
-        f"â”‚ â±ï¸ <b>Uptime:</b> <code>{uptime}</code>\n"
-        f"â”‚ ðŸ¤– <b>Version:</b> <code>v{BOT_VERSION}</code>\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        f"💀 <b>Skull Ads — Public Stats</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ 👥 <b>Total Users:</b> <code>{total_users}</code>\n"
+        f"│ 🚀 <b>Messages Sent:</b> <code>{total_sent:,}</code>\n"
+        f"│ 📊 <b>Campaigns Created:</b> <code>{total_campaigns}</code>\n"
+        f"│ ⏱️ <b>Uptime:</b> <code>{uptime}</code>\n"
+        f"│ 🤖 <b>Version:</b> <code>v{BOT_VERSION}</code>\n"
+        f"└─────────────────────"
     )
     await safe_edit(
         query.message, text,
         InlineKeyboardMarkup([
-            [InlineKeyboardButton("ðŸ”™ Back", callback_data="back_start")]
+            [InlineKeyboardButton("🔙 Back", callback_data="back_start")]
         ])
     )
 
 
 # =====================================================
-# ðŸ’Ž PREMIUM PLANS
+# 💎 PREMIUM PLANS
 # =====================================================
 @bot.on_callback_query(filters.regex("^show_plans$"))
 async def show_plans_cb(client, query: CallbackQuery):
@@ -1006,44 +1006,44 @@ async def show_plans_cb(client, query: CallbackQuery):
     plan_info = get_user_plan_info(u_id)
 
     text = (
-        f"ðŸ’Ž <b>Skull Ads â€” Premium Plans</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ“Š <b>Your Current Plan:</b> {current_plan}\n"
-        f"â”‚ ðŸ‘¥ <b>Account Limit:</b> <code>{limit}</code>\n"
-        f"â”‚ ðŸŽ¯ <b>Target Limit:</b> <code>{plan_info.get('max_targets', 50)}</code>\n"
-        f"â”‚ ðŸ”„ <b>Round Limit:</b> <code>{plan_info.get('max_rounds', 5)}</code>\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
-        f"ðŸ†“ <b>Free Plan</b>\n"
-        f"â”œ 1 Account â€¢ 50 Targets â€¢ 5 Rounds\n"
-        f"â”” Basic Features\n\n"
-        f"âš¡ <b>Basic Plan â€” â‚¹99/month</b>\n"
-        f"â”œ 3 Accounts â€¢ 200 Targets â€¢ 50 Rounds\n"
-        f"â”” All Features Unlocked\n\n"
-        f"ðŸ’Ž <b>Pro Plan â€” â‚¹249/month</b>\n"
-        f"â”œ 10 Accounts â€¢ 1000 Targets â€¢ 500 Rounds\n"
-        f"â”” Priority Support\n\n"
-        f"ðŸ‘‘ <b>Elite Plan â€” â‚¹499/month</b>\n"
-        f"â”œ Unlimited Everything\n"
-        f"â”” VIP Support + Custom Features\n\n"
-        f"ðŸ“© <b>Contact admin to purchase:</b>"
+        f"💎 <b>Skull Ads — Premium Plans</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ 📊 <b>Your Current Plan:</b> {current_plan}\n"
+        f"│ 👥 <b>Account Limit:</b> <code>{limit}</code>\n"
+        f"│ 🎯 <b>Target Limit:</b> <code>{plan_info.get('max_targets', 50)}</code>\n"
+        f"│ 🔄 <b>Round Limit:</b> <code>{plan_info.get('max_rounds', 5)}</code>\n"
+        f"└─────────────────────\n\n"
+        f"🆓 <b>Free Plan</b>\n"
+        f"├ 1 Account • 50 Targets • 5 Rounds\n"
+        f"└ Basic Features\n\n"
+        f"⚡ <b>Basic Plan — ₹99/month</b>\n"
+        f"├ 3 Accounts • 200 Targets • 50 Rounds\n"
+        f"└ All Features Unlocked\n\n"
+        f"💎 <b>Pro Plan — ₹249/month</b>\n"
+        f"├ 10 Accounts • 1000 Targets • 500 Rounds\n"
+        f"└ Priority Support\n\n"
+        f"👑 <b>Elite Plan — ₹499/month</b>\n"
+        f"├ Unlimited Everything\n"
+        f"└ VIP Support + Custom Features\n\n"
+        f"📩 <b>Contact admin to purchase:</b>"
     )
 
     markup = InlineKeyboardMarkup([
         [InlineKeyboardButton(
-            "ðŸ’¬ Buy â€” @securedsitedns",
+            "💬 Buy — @securedsitedns",
             url="https://t.me/securedsitedns"
         )],
         [InlineKeyboardButton(
-            "ðŸ¤– Owner",
+            "🤖 Owner",
             url="https://t.me/securedsitedns"
         )],
-        [InlineKeyboardButton("ðŸ”™ Back", callback_data="back_start")]
+        [InlineKeyboardButton("🔙 Back", callback_data="back_start")]
     ])
     await safe_edit(query.message, text, markup)
 
 
 # =====================================================
-# ðŸ’» DASHBOARD
+# 💻 DASHBOARD
 # =====================================================
 @bot.on_callback_query(filters.regex("^open_dash$"))
 async def open_dash_cb(client, query: CallbackQuery):
@@ -1074,62 +1074,62 @@ async def send_dash(msg_or_query, u_id: int, is_edit: bool = False):
     camp = data.get("campaigns", {}).get(str(u_id), {})
     camp_status = camp.get("status", "IDLE")
     target_count = len(camp.get("targets", []))
-    ad_set = "âœ…" if camp.get("ad_html") else "âŒ"
-    settings_set = "âœ…" if camp.get("group_delay") else "âŒ"
+    ad_set = "✅" if camp.get("ad_html") else "❌"
+    settings_set = "✅" if camp.get("group_delay") else "❌"
 
     status_map = {
-        "RUNNING": "ðŸŸ¢ RUNNING",
-        "PAUSED": "ðŸ”´ PAUSED",
-        "COMPLETED": "âœ… COMPLETED",
-        "IDLE": "âšª IDLE"
+        "RUNNING": "🟢 RUNNING",
+        "PAUSED": "🔴 PAUSED",
+        "COMPLETED": "✅ COMPLETED",
+        "IDLE": "⚪ IDLE"
     }
-    status_display = status_map.get(camp_status, "âšª IDLE")
+    status_display = status_map.get(camp_status, "⚪ IDLE")
 
-    acc_display = "âŒ None Selected"
+    acc_display = "❌ None Selected"
     if active_acc:
         phone = active_acc.get("phone", "Unknown")
-        acc_display = f"âœ… <tg-spoiler>{phone}</tg-spoiler>"
+        acc_display = f"✅ <tg-spoiler>{phone}</tg-spoiler>"
 
     text = (
-        f"ðŸ’€ <b>Skull Ads â€” Dashboard</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ’Ž <b>Plan:</b> {plan}\n"
-        f"â”‚ ðŸ‘¥ <b>Accounts:</b> <code>{account_count}/{limit}</code>\n"
-        f"â”‚ ðŸŽ¯ <b>Active:</b> {acc_display}\n"
-        f"â”‚ ðŸ“Š <b>Status:</b> {status_display}\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸŽ¯ Targets: <code>{target_count}</code> | "
-        f"ðŸ“ Ad: {ad_set} | âš™ï¸ Config: {settings_set}\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
+        f"💀 <b>Skull Ads — Dashboard</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ 💎 <b>Plan:</b> {plan}\n"
+        f"│ 👥 <b>Accounts:</b> <code>{account_count}/{limit}</code>\n"
+        f"│ 🎯 <b>Active:</b> {acc_display}\n"
+        f"│ 📊 <b>Status:</b> {status_display}\n"
+        f"├─────────────────────\n"
+        f"│ 🎯 Targets: <code>{target_count}</code> | "
+        f"📝 Ad: {ad_set} | ⚙️ Config: {settings_set}\n"
+        f"└─────────────────────\n\n"
         f"Select an option below:"
     )
 
     if camp_status == "RUNNING":
         action_row = [
-            InlineKeyboardButton("ðŸ›‘ Stop Campaign", callback_data="stop_ads"),
-            InlineKeyboardButton("ðŸ“Š Live Stats", callback_data="show_my_stats")
+            InlineKeyboardButton("🛑 Stop Campaign", callback_data="stop_ads"),
+            InlineKeyboardButton("📊 Live Stats", callback_data="show_my_stats")
         ]
     else:
         action_row = [
-            InlineKeyboardButton("â–¶ï¸ Launch", callback_data="launch_ads"),
-            InlineKeyboardButton("ðŸ“Š My Stats", callback_data="show_my_stats")
+            InlineKeyboardButton("▶️ Launch", callback_data="launch_ads"),
+            InlineKeyboardButton("📊 My Stats", callback_data="show_my_stats")
         ]
 
     markup = InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("ðŸ‘¥ Accounts", callback_data="accounts_menu"),
-            InlineKeyboardButton("ðŸŽ¯ Targets", callback_data="target_menu")
+            InlineKeyboardButton("👥 Accounts", callback_data="accounts_menu"),
+            InlineKeyboardButton("🎯 Targets", callback_data="target_menu")
         ],
         [
-            InlineKeyboardButton("ðŸ“ Ad Message", callback_data="ask_ad_msg"),
-            InlineKeyboardButton("âš™ï¸ Settings", callback_data="start_settings_wizard")
+            InlineKeyboardButton("📝 Ad Message", callback_data="ask_ad_msg"),
+            InlineKeyboardButton("⚙️ Settings", callback_data="start_settings_wizard")
         ],
         action_row,
         [
-            InlineKeyboardButton("ðŸ’Ž Premium", callback_data="show_plans"),
-            InlineKeyboardButton("ðŸ”— Referral", callback_data="my_referral")
+            InlineKeyboardButton("💎 Premium", callback_data="show_plans"),
+            InlineKeyboardButton("🔗 Referral", callback_data="my_referral")
         ],
-        [InlineKeyboardButton("ðŸ  Main Menu", callback_data="back_start")]
+        [InlineKeyboardButton("🏠 Main Menu", callback_data="back_start")]
     ])
 
     try:
@@ -1144,7 +1144,7 @@ async def send_dash(msg_or_query, u_id: int, is_edit: bool = False):
 
 
 # =====================================================
-# ðŸ‘¥ ACCOUNTS MENU
+# 👥 ACCOUNTS MENU
 # =====================================================
 @bot.on_callback_query(filters.regex("^accounts_menu$"))
 async def accounts_menu_cb(client, query: CallbackQuery):
@@ -1159,19 +1159,19 @@ async def accounts_menu_cb(client, query: CallbackQuery):
     active_key = data.get("active_account", {}).get(str(u_id))
 
     text = (
-        f"ðŸ’€ <b>Skull Ads â€” Accounts</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ’Ž <b>Plan:</b> {plan}\n"
-        f"â”‚ ðŸ‘¥ <b>Used Slots:</b> <code>{len(user_accs)}/{limit}</code>\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
-        f"<b>ðŸŸ¢ = Active Account</b>\n"
+        f"💀 <b>Skull Ads — Accounts</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ 💎 <b>Plan:</b> {plan}\n"
+        f"│ 👥 <b>Used Slots:</b> <code>{len(user_accs)}/{limit}</code>\n"
+        f"└─────────────────────\n\n"
+        f"<b>🟢 = Active Account</b>\n"
         f"<b>Tap account to set as active</b>"
     )
 
     buttons = []
     for acc_key, acc in user_accs.items():
         phone = acc.get("phone", "Unknown")
-        is_active = "ðŸŸ¢" if acc_key == active_key else "âš«"
+        is_active = "🟢" if acc_key == active_key else "⚫"
         added = acc.get("added_date", "N/A")[:10]
         buttons.append([
             InlineKeyboardButton(
@@ -1179,28 +1179,28 @@ async def accounts_menu_cb(client, query: CallbackQuery):
                 callback_data=f"select_acc_{acc_key}"
             ),
             InlineKeyboardButton(
-                "ðŸ—‘ï¸", callback_data=f"confirm_del_acc_{acc_key}"
+                "🗑️", callback_data=f"confirm_del_acc_{acc_key}"
             )
         ])
 
     if not user_accs:
-        text += "\n\nðŸ“­ <b>No accounts added yet!</b>"
+        text += "\n\n📭 <b>No accounts added yet!</b>"
 
     if len(user_accs) < limit:
         buttons.append([
             InlineKeyboardButton(
-                "âž• Add New Account", callback_data="login_acc"
+                "➕ Add New Account", callback_data="login_acc"
             )
         ])
     else:
         buttons.append([
             InlineKeyboardButton(
-                "ðŸ’Ž Upgrade for More Slots", callback_data="show_plans"
+                "💎 Upgrade for More Slots", callback_data="show_plans"
             )
         ])
 
     buttons.append([
-        InlineKeyboardButton("ðŸ”™ Dashboard", callback_data="open_dash")
+        InlineKeyboardButton("🔙 Dashboard", callback_data="open_dash")
     ])
 
     await safe_edit(
@@ -1208,7 +1208,7 @@ async def accounts_menu_cb(client, query: CallbackQuery):
     )
 
 
-# â”€â”€ Select Account â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Select Account ────────────────────────────────────
 @bot.on_callback_query(filters.regex(r"^select_acc_(.+)$"))
 async def select_acc_cb(client, query: CallbackQuery):
     u_id = query.from_user.id
@@ -1216,7 +1216,7 @@ async def select_acc_cb(client, query: CallbackQuery):
     user_accs = get_user_accounts(u_id)
 
     if acc_key not in user_accs:
-        return await query.answer("âŒ Account not found!", show_alert=True)
+        return await query.answer("❌ Account not found!", show_alert=True)
 
     data = await async_get_data()
     if "active_account" not in data:
@@ -1225,11 +1225,11 @@ async def select_acc_cb(client, query: CallbackQuery):
     await async_update_data(data)
 
     phone = user_accs[acc_key].get("phone", "Unknown")
-    await query.answer(f"âœ… Active: {phone}", show_alert=True)
+    await query.answer(f"✅ Active: {phone}", show_alert=True)
     await accounts_menu_cb(client, query)
 
 
-# â”€â”€ Confirm Delete Account â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Confirm Delete Account ────────────────────────────
 @bot.on_callback_query(filters.regex(r"^confirm_del_acc_(.+)$"))
 async def confirm_del_acc_cb(client, query: CallbackQuery):
     u_id = query.from_user.id
@@ -1237,27 +1237,27 @@ async def confirm_del_acc_cb(client, query: CallbackQuery):
     user_accs = get_user_accounts(u_id)
 
     if acc_key not in user_accs:
-        return await query.answer("âŒ Account not found!", show_alert=True)
+        return await query.answer("❌ Account not found!", show_alert=True)
 
     phone = user_accs[acc_key].get("phone", "Unknown")
     text = (
-        f"ðŸ’€ <b>Confirm Account Removal</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ“± <b>Phone:</b> {phone}\n"
-        f"â”‚ âš ï¸ This will log out the session.\n"
-        f"â”‚ This action cannot be undone!\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        f"💀 <b>Confirm Account Removal</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ 📱 <b>Phone:</b> {phone}\n"
+        f"│ ⚠️ This will log out the session.\n"
+        f"│ This action cannot be undone!\n"
+        f"└─────────────────────"
     )
     await safe_edit(
         query.message, text,
         InlineKeyboardMarkup([
             [
                 InlineKeyboardButton(
-                    "âœ… Yes, Remove",
+                    "✅ Yes, Remove",
                     callback_data=f"del_acc_{acc_key}"
                 ),
                 InlineKeyboardButton(
-                    "âŒ Cancel",
+                    "❌ Cancel",
                     callback_data="accounts_menu"
                 )
             ]
@@ -1265,7 +1265,7 @@ async def confirm_del_acc_cb(client, query: CallbackQuery):
     )
 
 
-# â”€â”€ Delete Account â€” Fixed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Delete Account — Fixed ────────────────────────────
 @bot.on_callback_query(filters.regex(r"^del_acc_(.+)$"))
 async def del_acc_cb(client, query: CallbackQuery):
     u_id = query.from_user.id
@@ -1276,7 +1276,7 @@ async def del_acc_cb(client, query: CallbackQuery):
     # Verify account belongs to this user
     acc = data["accounts"].get(acc_key)
     if not acc or acc.get("user_id") != u_id:
-        return await query.answer("âŒ Account not found!", show_alert=True)
+        return await query.answer("❌ Account not found!", show_alert=True)
 
     # Try to restore profile and logout session
     try:
@@ -1337,19 +1337,19 @@ async def del_acc_cb(client, query: CallbackQuery):
     if not remaining:
         if data.get("campaigns", {}).get(str(u_id), {}).get("status") == "RUNNING":
             data["campaigns"][str(u_id)]["status"] = "PAUSED"
-            logger.info(f"Campaign paused for user {u_id} â€” no accounts left.")
+            logger.info(f"Campaign paused for user {u_id} — no accounts left.")
 
     data["settings"]["lifetime_logouts"] = (
         data["settings"].get("lifetime_logouts", 0) + 1
     )
     await async_update_data(data)
 
-    await query.answer("âœ… Account removed!", show_alert=True)
+    await query.answer("✅ Account removed!", show_alert=True)
     await accounts_menu_cb(client, query)
 
 
 # =====================================================
-# ðŸ“± LOGIN FLOW
+# 📱 LOGIN FLOW
 # =====================================================
 @bot.on_callback_query(filters.regex("^login_acc$"))
 async def login_btn(client, query: CallbackQuery):
@@ -1359,57 +1359,57 @@ async def login_btn(client, query: CallbackQuery):
 
     if len(user_accs) >= limit:
         text = (
-            f"ðŸ’€ <b>Account Limit Reached!</b>\n\n"
-            f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            f"â”‚ ðŸš« You've used all <b>{limit}</b> slot(s).\n"
-            f"â”‚ Upgrade your plan to add more.\n"
-            f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
-            f"ðŸ†“ <b>Free:</b> 1 account\n"
-            f"âš¡ <b>Basic:</b> 3 accounts â€” â‚¹99/m\n"
-            f"ðŸ’Ž <b>Pro:</b> 10 accounts â€” â‚¹249/m\n"
-            f"ðŸ‘‘ <b>Elite:</b> Unlimited â€” â‚¹499/m"
+            f"💀 <b>Account Limit Reached!</b>\n\n"
+            f"┌─────────────────────\n"
+            f"│ 🚫 You've used all <b>{limit}</b> slot(s).\n"
+            f"│ Upgrade your plan to add more.\n"
+            f"└─────────────────────\n\n"
+            f"🆓 <b>Free:</b> 1 account\n"
+            f"⚡ <b>Basic:</b> 3 accounts — ₹99/m\n"
+            f"💎 <b>Pro:</b> 10 accounts — ₹249/m\n"
+            f"👑 <b>Elite:</b> Unlimited — ₹499/m"
         )
         markup = InlineKeyboardMarkup([
             [InlineKeyboardButton(
-                "ðŸ’Ž Buy Premium â€” @securedsitedns",
+                "💎 Buy Premium — @securedsitedns",
                 url="https://t.me/securedsitedns"
             )],
-            [InlineKeyboardButton("ðŸ”™ Back", callback_data="accounts_menu")]
+            [InlineKeyboardButton("🔙 Back", callback_data="accounts_menu")]
         ])
         return await safe_edit(query.message, text, markup)
 
     user_state[u_id] = {"step": "wait_phone", "_created": time.time()}
     await safe_edit(
         query.message,
-        "ðŸ’€ <b>Skull Ads â€” Secure Login</b>\n\n"
-        "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        "â”‚ ðŸ“± Send your phone number.\n"
-        "â”‚\n"
-        "â”‚ <b>Any format works!</b>\n"
-        "â”‚ â€¢ <code>+919876543210</code>\n"
-        "â”‚ â€¢ <code>919876543210</code>\n"
-        "â”‚ â€¢ <code>9876543210</code>\n"
-        "â”‚ â€¢ <code>+1 202 555 1234</code>\n"
-        "â”‚ â€¢ <code>91 98765-43210</code>\n"
-        "â”‚\n"
-        "â”‚ âœ… Bot will auto-format your number.\n"
-        "â”‚ ðŸ”’ Your data is encrypted.\n"
-        "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
-        "âš ï¸ Type /cancel to abort.",
+        "💀 <b>Skull Ads — Secure Login</b>\n\n"
+        "┌─────────────────────\n"
+        "│ 📱 Send your phone number.\n"
+        "│\n"
+        "│ <b>Any format works!</b>\n"
+        "│ • <code>+919876543210</code>\n"
+        "│ • <code>919876543210</code>\n"
+        "│ • <code>9876543210</code>\n"
+        "│ • <code>+1 202 555 1234</code>\n"
+        "│ • <code>91 98765-43210</code>\n"
+        "│\n"
+        "│ ✅ Bot will auto-format your number.\n"
+        "│ 🔒 Your data is encrypted.\n"
+        "└─────────────────────\n\n"
+        "⚠️ Type /cancel to abort.",
         InlineKeyboardMarkup([
-            [InlineKeyboardButton("âŒ Cancel", callback_data="accounts_menu")]
+            [InlineKeyboardButton("❌ Cancel", callback_data="accounts_menu")]
         ])
     )
 
 
 async def finish_login(message: Message, tc, u_id: int, phone: str):
-    """Complete login process â€” Fixed profile fetch and bio save."""
+    """Complete login process — Fixed profile fetch and bio save."""
     try:
         sess = await tc.export_session_string()
     except Exception as e:
         logger.error(f"Export session error: {e}")
         await message.reply_text(
-            "âŒ <b>Login failed during session export.</b>\nPlease try again.",
+            "❌ <b>Login failed during session export.</b>\nPlease try again.",
             parse_mode=ParseMode.HTML
         )
         try:
@@ -1440,18 +1440,18 @@ async def finish_login(message: Message, tc, u_id: int, phone: str):
     if not is_admin(u_id):
         try:
             new_name = old_name
-            if old_name and "SkullAdsBot" not in old_name:
-                new_name = f"{old_name} | @SkullAdsBot â˜ ï¸"
+            if old_name and "MarketingBot" not in old_name:
+                new_name = f"{old_name} | @securedsitedns ☠️"
             elif not old_name:
-                new_name = "@SkullAdsBot â˜ ï¸"
+                new_name = "@securedsitedns ☠️"
             await tc.update_profile(
                 first_name=new_name,
-                bio="ðŸ’€ Aá´œá´›á´á´á´€á´›á´‡á´… Aá´…s VÉªá´€ @SkullAdsBot â˜ ï¸ | @securedsitedns"
+                bio="💀 Aᴜᴛᴏᴍᴀᴛᴇᴅ Aᴅs Vɪᴀ @securedsitedns ☠️ | @securedsitedns"
             )
         except Exception as e:
             logger.warning(f"Profile update error (non-critical): {e}")
     else:
-        logger.info("ðŸ‘‘ Admin Login: Profile update bypassed.")
+        logger.info("👑 Admin Login: Profile update bypassed.")
 
     acc_key = f"{u_id}_{phone.replace('+', '').replace(' ', '')}"
     data = await async_get_data()
@@ -1486,16 +1486,16 @@ async def finish_login(message: Message, tc, u_id: int, phone: str):
         del user_state[u_id]
 
     await message.reply_text(
-        f"ðŸ’€ <b>Login Successful!</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ âœ… Linked: <tg-spoiler>{phone}</tg-spoiler>\n"
-        f"â”‚ ðŸŸ¢ Set as active account.\n"
-        f"â”‚ You can now launch campaigns!\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+        f"💀 <b>Login Successful!</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ ✅ Linked: <tg-spoiler>{phone}</tg-spoiler>\n"
+        f"│ 🟢 Set as active account.\n"
+        f"│ You can now launch campaigns!\n"
+        f"└─────────────────────",
         reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("ðŸ’» Dashboard", callback_data="open_dash")],
+            [InlineKeyboardButton("💻 Dashboard", callback_data="open_dash")],
             [InlineKeyboardButton(
-                "ðŸ‘¥ Manage Accounts", callback_data="accounts_menu"
+                "👥 Manage Accounts", callback_data="accounts_menu"
             )]
         ]),
         parse_mode=ParseMode.HTML
@@ -1503,7 +1503,7 @@ async def finish_login(message: Message, tc, u_id: int, phone: str):
 
 
 # =====================================================
-# ðŸ“Š MY STATS
+# 📊 MY STATS
 # =====================================================
 @bot.on_callback_query(filters.regex("^show_my_stats$"))
 async def show_my_stats_cb(client, query: CallbackQuery):
@@ -1519,30 +1519,30 @@ async def show_my_stats_cb(client, query: CallbackQuery):
     plan = get_user_plan_name(u_id)
 
     target_count = len(camp.get("targets", []))
-    ad_status = "âœ… Set" if camp.get("ad_html") else "âŒ Not Set"
+    ad_status = "✅ Set" if camp.get("ad_html") else "❌ Not Set"
 
     delay = camp.get("group_delay", 0)
     interval_min = int(camp.get("interval", 0) / 60) if camp.get("interval") else 0
     total_rounds = camp.get("total_rounds", 0)
-    round_str = "â™¾ï¸ Unlimited" if total_rounds > 9000000 else str(total_rounds)
+    round_str = "♾️ Unlimited" if total_rounds > 9000000 else str(total_rounds)
 
     settings_str = (
-        f"â³ {delay}s â€¢ â±ï¸ {interval_min}m â€¢ ðŸ”„ {round_str}"
-        if delay > 0 else "âš™ï¸ Not Configured"
+        f"⏳ {delay}s • ⏱️ {interval_min}m • 🔄 {round_str}"
+        if delay > 0 else "⚙️ Not Configured"
     )
 
     camp_status = camp.get("status", "IDLE")
     status_map = {
-        "RUNNING": "ðŸŸ¢ RUNNING",
-        "PAUSED": "ðŸ”´ PAUSED",
-        "COMPLETED": "âœ… COMPLETED",
-        "IDLE": "âšª IDLE"
+        "RUNNING": "🟢 RUNNING",
+        "PAUSED": "🔴 PAUSED",
+        "COMPLETED": "✅ COMPLETED",
+        "IDLE": "⚪ IDLE"
     }
-    status_display = status_map.get(camp_status, "âšª IDLE")
+    status_display = status_map.get(camp_status, "⚪ IDLE")
 
     c_round = camp.get("current_round", 0)
     round_display = (
-        f"{c_round}/â™¾ï¸" if total_rounds > 9000000
+        f"{c_round}/♾️" if total_rounds > 9000000
         else f"{c_round}/{total_rounds}" if total_rounds > 0
         else "0/0"
     )
@@ -1555,33 +1555,33 @@ async def show_my_stats_cb(client, query: CallbackQuery):
     ref_count = len(data.get("referrals", {}).get(str(u_id), []))
 
     text = (
-        f"ðŸ’€ <b>Skull Ads â€” My Stats</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ’Ž <b>Plan:</b> {plan}\n"
-        f"â”‚ ðŸ‘¥ <b>Accounts:</b> <code>{len(user_accs)}/{limit}</code>\n"
-        f"â”‚ ðŸŽ¯ <b>Targets:</b> <code>{target_count}</code> Groups\n"
-        f"â”‚ ðŸ“ <b>Ad Message:</b> {ad_status}\n"
-        f"â”‚ âš™ï¸ <b>Settings:</b> {settings_str}\n"
-        f"â”‚ ðŸ“Š <b>Campaign:</b> {status_display}\n"
-        f"â”‚ ðŸ”„ <b>Round:</b> {round_display}\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸš€ <b>Total Sent:</b> <code>{stats['total_sent']:,}</code>\n"
-        f"â”‚ âŒ <b>Failed:</b> <code>{stats['failed']:,}</code>\n"
-        f"â”‚ ðŸ“ˆ <b>Success Rate:</b> <code>{success_rate}%</code>\n"
-        f"â”‚ ðŸ”— <b>Referrals:</b> <code>{ref_count}</code>\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        f"💀 <b>Skull Ads — My Stats</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ 💎 <b>Plan:</b> {plan}\n"
+        f"│ 👥 <b>Accounts:</b> <code>{len(user_accs)}/{limit}</code>\n"
+        f"│ 🎯 <b>Targets:</b> <code>{target_count}</code> Groups\n"
+        f"│ 📝 <b>Ad Message:</b> {ad_status}\n"
+        f"│ ⚙️ <b>Settings:</b> {settings_str}\n"
+        f"│ 📊 <b>Campaign:</b> {status_display}\n"
+        f"│ 🔄 <b>Round:</b> {round_display}\n"
+        f"├─────────────────────\n"
+        f"│ 🚀 <b>Total Sent:</b> <code>{stats['total_sent']:,}</code>\n"
+        f"│ ❌ <b>Failed:</b> <code>{stats['failed']:,}</code>\n"
+        f"│ 📈 <b>Success Rate:</b> <code>{success_rate}%</code>\n"
+        f"│ 🔗 <b>Referrals:</b> <code>{ref_count}</code>\n"
+        f"└─────────────────────"
     )
     await safe_edit(
         query.message, text,
         InlineKeyboardMarkup([
-            [InlineKeyboardButton("ðŸ”„ Refresh", callback_data="show_my_stats")],
-            [InlineKeyboardButton("ðŸ”™ Dashboard", callback_data="open_dash")]
+            [InlineKeyboardButton("🔄 Refresh", callback_data="show_my_stats")],
+            [InlineKeyboardButton("🔙 Dashboard", callback_data="open_dash")]
         ])
     )
 
 
 # =====================================================
-# ðŸŽ¯ TARGET SELECTION
+# 🎯 TARGET SELECTION
 # =====================================================
 @bot.on_callback_query(filters.regex("^target_menu$"))
 async def target_menu_cb(client, query: CallbackQuery):
@@ -1596,44 +1596,44 @@ async def target_menu_cb(client, query: CallbackQuery):
     max_targets = plan_info.get("max_targets", 50)
 
     text = (
-        f"ðŸ’€ <b>Skull Ads â€” Target Selection</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸŽ¯ <b>Current Targets:</b> <code>{target_count}</code>\n"
-        f"â”‚ ðŸ“Š <b>Max Allowed:</b> <code>{max_targets}</code>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ“¥ <b>Auto-Fetch</b> â€” Scan your joined groups\n"
-        f"â”‚ ðŸ”— <b>Custom Links</b> â€” Add group links manually\n"
-        f"â”‚ ðŸ—‘ï¸ <b>Clear</b> â€” Remove all targets\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        f"💀 <b>Skull Ads — Target Selection</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ 🎯 <b>Current Targets:</b> <code>{target_count}</code>\n"
+        f"│ 📊 <b>Max Allowed:</b> <code>{max_targets}</code>\n"
+        f"├─────────────────────\n"
+        f"│ 📥 <b>Auto-Fetch</b> — Scan your joined groups\n"
+        f"│ 🔗 <b>Custom Links</b> — Add group links manually\n"
+        f"│ 🗑️ <b>Clear</b> — Remove all targets\n"
+        f"└─────────────────────"
     )
 
     buttons = [
         [InlineKeyboardButton(
-            "ðŸ“¥ Auto-Fetch Groups", callback_data="fetch_groups"
+            "📥 Auto-Fetch Groups", callback_data="fetch_groups"
         )],
         [InlineKeyboardButton(
-            "ðŸ”— Add Custom Links", callback_data="ask_custom_links"
+            "🔗 Add Custom Links", callback_data="ask_custom_links"
         )],
     ]
 
     if target_count > 0:
         buttons.append([
             InlineKeyboardButton(
-                "ðŸ“‹ View Targets", callback_data="view_targets"
+                "📋 View Targets", callback_data="view_targets"
             ),
             InlineKeyboardButton(
-                "ðŸ—‘ï¸ Clear All", callback_data="clear_targets"
+                "🗑️ Clear All", callback_data="clear_targets"
             )
         ])
 
     buttons.append([
-        InlineKeyboardButton("ðŸ”™ Dashboard", callback_data="open_dash")
+        InlineKeyboardButton("🔙 Dashboard", callback_data="open_dash")
     ])
 
     await safe_edit(query.message, text, InlineKeyboardMarkup(buttons))
 
 
-# â”€â”€ View Targets â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── View Targets ──────────────────────────────────────
 @bot.on_callback_query(filters.regex("^view_targets$"))
 async def view_targets_cb(client, query: CallbackQuery):
     u_id = query.from_user.id
@@ -1641,28 +1641,28 @@ async def view_targets_cb(client, query: CallbackQuery):
     targets = data.get("campaigns", {}).get(str(u_id), {}).get("targets", [])
 
     if not targets:
-        return await query.answer("âŒ No targets set!", show_alert=True)
+        return await query.answer("❌ No targets set!", show_alert=True)
 
-    text = f"ðŸ’€ <b>Current Targets ({len(targets)})</b>\n\nâ”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
+    text = f"💀 <b>Current Targets ({len(targets)})</b>\n\n┌─────────────────────\n"
     for i, t in enumerate(targets[:30], 1):
         display = truncate_text(str(t), 30)
-        text += f"â”‚ {i}. <code>{display}</code>\n"
+        text += f"│ {i}. <code>{display}</code>\n"
     if len(targets) > 30:
-        text += f"â”‚ ... +{len(targets) - 30} more\n"
-    text += "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        text += f"│ ... +{len(targets) - 30} more\n"
+    text += "└─────────────────────"
 
     await safe_edit(
         query.message, text,
         InlineKeyboardMarkup([
             [InlineKeyboardButton(
-                "ðŸ—‘ï¸ Clear All", callback_data="clear_targets"
+                "🗑️ Clear All", callback_data="clear_targets"
             )],
-            [InlineKeyboardButton("ðŸ”™ Back", callback_data="target_menu")]
+            [InlineKeyboardButton("🔙 Back", callback_data="target_menu")]
         ])
     )
 
 
-# â”€â”€ Clear Targets â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Clear Targets ─────────────────────────────────────
 @bot.on_callback_query(filters.regex("^clear_targets$"))
 async def clear_targets_cb(client, query: CallbackQuery):
     u_id = query.from_user.id
@@ -1671,36 +1671,36 @@ async def clear_targets_cb(client, query: CallbackQuery):
         data["campaigns"][str(u_id)]["targets"] = []
         data["campaigns"][str(u_id)].pop("cache_grps", None)
         await async_update_data(data)
-    await query.answer("âœ… All targets cleared!", show_alert=True)
+    await query.answer("✅ All targets cleared!", show_alert=True)
     await target_menu_cb(client, query)
 
 
-# â”€â”€ Fetch Groups â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Fetch Groups ──────────────────────────────────────
 @bot.on_callback_query(filters.regex("^fetch_groups$"))
 async def fetch_groups_cb(client, query: CallbackQuery):
     u_id = query.from_user.id
 
     # Rate limit to prevent spam clicks
     if is_rate_limited(u_id, "fetch_groups", 10):
-        return await query.answer("â³ Please wait before fetching again.", show_alert=True)
+        return await query.answer("⏳ Please wait before fetching again.", show_alert=True)
 
     data = get_data()
     active_key, active_acc = get_active_account(u_id)
 
     if not active_key or not active_acc:
         return await query.answer(
-            "âš ï¸ No active account! Add & select an account first.",
+            "⚠️ No active account! Add & select an account first.",
             show_alert=True
         )
 
     await query.answer("Scanning groups...", show_alert=False)
     await safe_edit(
         query.message,
-        "ðŸ’€ <b>Fetching Groups...</b>\n\n"
-        "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        "â”‚ â³ Scanning your account...\n"
-        "â”‚ This may take a moment.\n"
-        "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        "💀 <b>Fetching Groups...</b>\n\n"
+        "┌─────────────────────\n"
+        "│ ⏳ Scanning your account...\n"
+        "│ This may take a moment.\n"
+        "└─────────────────────"
     )
 
     tc = None
@@ -1737,18 +1737,18 @@ async def fetch_groups_cb(client, query: CallbackQuery):
         if not grps:
             return await safe_edit(
                 query.message,
-                "ðŸ’€ <b>No Groups Found!</b>\n\n"
-                "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                "â”‚ âŒ No joined groups found.\n"
-                "â”‚ Try adding custom links instead.\n"
-                "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+                "💀 <b>No Groups Found!</b>\n\n"
+                "┌─────────────────────\n"
+                "│ ❌ No joined groups found.\n"
+                "│ Try adding custom links instead.\n"
+                "└─────────────────────",
                 InlineKeyboardMarkup([
                     [InlineKeyboardButton(
-                        "ðŸ”— Add Custom Links",
+                        "🔗 Add Custom Links",
                         callback_data="ask_custom_links"
                     )],
                     [InlineKeyboardButton(
-                        "ðŸ”™ Back", callback_data="target_menu"
+                        "🔙 Back", callback_data="target_menu"
                     )]
                 ])
             )
@@ -1776,17 +1776,17 @@ async def fetch_groups_cb(client, query: CallbackQuery):
             await async_update_data(data)
         await safe_edit(
             query.message,
-            "ðŸ’€ <b>Session Expired!</b>\n\n"
-            "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            "â”‚ âš ï¸ Session was revoked/expired.\n"
-            "â”‚ Please login again.\n"
-            "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+            "💀 <b>Session Expired!</b>\n\n"
+            "┌─────────────────────\n"
+            "│ ⚠️ Session was revoked/expired.\n"
+            "│ Please login again.\n"
+            "└─────────────────────",
             InlineKeyboardMarkup([
                 [InlineKeyboardButton(
-                    "âž• Add Account", callback_data="login_acc"
+                    "➕ Add Account", callback_data="login_acc"
                 )],
                 [InlineKeyboardButton(
-                    "ðŸ”™ Back", callback_data="target_menu"
+                    "🔙 Back", callback_data="target_menu"
                 )]
             ])
         )
@@ -1799,13 +1799,13 @@ async def fetch_groups_cb(client, query: CallbackQuery):
         logger.error(f"Fetch groups error for user {u_id}: {e}")
         await safe_edit(
             query.message,
-            f"ðŸ’€ <b>Fetch Error!</b>\n\n"
-            f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            f"â”‚ âŒ {sanitize_html(str(e)[:100])}\n"
-            f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+            f"💀 <b>Fetch Error!</b>\n\n"
+            f"┌─────────────────────\n"
+            f"│ ❌ {sanitize_html(str(e)[:100])}\n"
+            f"└─────────────────────",
             InlineKeyboardMarkup([
-                [InlineKeyboardButton("ðŸ” Retry", callback_data="fetch_groups")],
-                [InlineKeyboardButton("ðŸ”™ Back", callback_data="target_menu")]
+                [InlineKeyboardButton("🔁 Retry", callback_data="fetch_groups")],
+                [InlineKeyboardButton("🔙 Back", callback_data="target_menu")]
             ])
         )
 
@@ -1828,7 +1828,7 @@ async def show_group_page(message, u_id: int, page: int):
     buttons = []
     for i, g in enumerate(grps[start:end]):
         idx = start + i
-        icon = "âœ…" if g.get("sel") else "â˜‘ï¸"
+        icon = "✅" if g.get("sel") else "☑️"
         members = g.get("members", 0)
         member_str = f" [{members}]" if members > 0 else ""
         buttons.append([
@@ -1841,14 +1841,14 @@ async def show_group_page(message, u_id: int, page: int):
     nav = []
     if page > 0:
         nav.append(InlineKeyboardButton(
-            "â—€ï¸ Prev", callback_data=f"tg_pg_{page - 1}"
+            "◀️ Prev", callback_data=f"tg_pg_{page - 1}"
         ))
     nav.append(InlineKeyboardButton(
-        f"ðŸ“„ {page + 1}/{total_pages}", callback_data="noop"
+        f"📄 {page + 1}/{total_pages}", callback_data="noop"
     ))
     if page < total_pages - 1:
         nav.append(InlineKeyboardButton(
-            "Next â–¶ï¸", callback_data=f"tg_pg_{page + 1}"
+            "Next ▶️", callback_data=f"tg_pg_{page + 1}"
         ))
     if nav:
         buttons.append(nav)
@@ -1856,23 +1856,23 @@ async def show_group_page(message, u_id: int, page: int):
     all_selected = selected_count == len(grps)
     buttons.extend([
         [InlineKeyboardButton(
-            f"ðŸ”„ {'Deselect' if all_selected else 'Select'} All",
+            f"🔄 {'Deselect' if all_selected else 'Select'} All",
             callback_data=f"tg_all_{page}"
         )],
         [InlineKeyboardButton(
-            f"âœ… Confirm ({selected_count}/{len(grps)})",
+            f"✅ Confirm ({selected_count}/{len(grps)})",
             callback_data="confirm_targets"
         )],
-        [InlineKeyboardButton("ðŸ”™ Back", callback_data="target_menu")]
+        [InlineKeyboardButton("🔙 Back", callback_data="target_menu")]
     ])
 
     text = (
-        f"ðŸ’€ <b>Select Target Groups</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ“‹ <b>Total Found:</b> <code>{len(grps)}</code>\n"
-        f"â”‚ âœ… <b>Selected:</b> <code>{selected_count}</code>\n"
-        f"â”‚ ðŸ“„ <b>Page:</b> {page + 1}/{total_pages}\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
+        f"💀 <b>Select Target Groups</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ 📋 <b>Total Found:</b> <code>{len(grps)}</code>\n"
+        f"│ ✅ <b>Selected:</b> <code>{selected_count}</code>\n"
+        f"│ 📄 <b>Page:</b> {page + 1}/{total_pages}\n"
+        f"└─────────────────────\n\n"
         f"Tap groups to toggle:"
     )
 
@@ -1890,7 +1890,7 @@ async def tg_handler_cb(client, query: CallbackQuery):
     grps = data["campaigns"].get(str(u_id), {}).get("cache_grps", [])
 
     if not grps:
-        return await query.answer("âŒ No groups cached!", show_alert=True)
+        return await query.answer("❌ No groups cached!", show_alert=True)
 
     page = 0
 
@@ -1924,14 +1924,14 @@ async def confirm_targets_cb(client, query: CallbackQuery):
 
     if not selected:
         return await query.answer(
-            "âš ï¸ Select at least 1 group!", show_alert=True
+            "⚠️ Select at least 1 group!", show_alert=True
         )
 
     plan_info = get_user_plan_info(u_id)
     max_targets = plan_info.get("max_targets", 50)
     if len(selected) > max_targets and not is_admin(u_id):
         return await query.answer(
-            f"âš ï¸ Your plan allows max {max_targets} targets! "
+            f"⚠️ Your plan allows max {max_targets} targets! "
             f"Upgrade to add more.",
             show_alert=True
         )
@@ -1941,13 +1941,13 @@ async def confirm_targets_cb(client, query: CallbackQuery):
     await async_update_data(data)
 
     await query.answer(
-        f"âœ… {len(selected)} Targets Saved!", show_alert=True
+        f"✅ {len(selected)} Targets Saved!", show_alert=True
     )
     await send_dash(query.message, u_id, is_edit=True)
 
 
 # =====================================================
-# ðŸ“ AD MESSAGE
+# 📝 AD MESSAGE
 # =====================================================
 @bot.on_callback_query(filters.regex("^ask_ad_msg$"))
 async def ask_ad_msg_cb(client, query: CallbackQuery):
@@ -1967,26 +1967,26 @@ async def ask_ad_msg_cb(client, query: CallbackQuery):
     user_state[u_id] = {"step": "wait_ad_msg", "_created": time.time()}
     await safe_edit(
         query.message,
-        "ðŸ’€ <b>Set Ad Message</b>\n\n"
-        "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        "â”‚ ðŸ“ Send your advertisement message.\n"
-        "â”‚\n"
-        "â”‚ <b>Supports:</b>\n"
-        "â”‚ â€¢ Bold, Italic, Underline\n"
-        "â”‚ â€¢ Links & Mentions\n"
-        "â”‚ â€¢ Emojis & Special chars\n"
-        "â”‚ â€¢ All HTML formatting\n"
-        "â”‚ â€¢ Multi-line messages\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€{preview}\n\n"
-        "âš ï¸ Send your message now or /cancel:",
+        "💀 <b>Set Ad Message</b>\n\n"
+        "┌─────────────────────\n"
+        "│ 📝 Send your advertisement message.\n"
+        "│\n"
+        "│ <b>Supports:</b>\n"
+        "│ • Bold, Italic, Underline\n"
+        "│ • Links & Mentions\n"
+        "│ • Emojis & Special chars\n"
+        "│ • All HTML formatting\n"
+        "│ • Multi-line messages\n"
+        f"└─────────────────────{preview}\n\n"
+        "⚠️ Send your message now or /cancel:",
         InlineKeyboardMarkup([
-            [InlineKeyboardButton("âŒ Cancel", callback_data="open_dash")]
+            [InlineKeyboardButton("❌ Cancel", callback_data="open_dash")]
         ])
     )
 
 
 # =====================================================
-# âš™ï¸ SETTINGS WIZARD
+# ⚙️ SETTINGS WIZARD
 # =====================================================
 @bot.on_callback_query(filters.regex("^start_settings_wizard$"))
 async def start_wizard_cb(client, query: CallbackQuery):
@@ -2001,26 +2001,26 @@ async def start_wizard_cb(client, query: CallbackQuery):
         d = camp.get("group_delay", 0)
         i = int(camp.get("interval", 0) / 60)
         r = camp.get("total_rounds", 0)
-        r_str = "â™¾ï¸" if r > 9000000 else str(r)
+        r_str = "♾️" if r > 9000000 else str(r)
         current = (
             f"\n\n<b>Current Settings:</b>\n"
-            f"â³ Delay: {d}s | â±ï¸ Interval: {i}m | ðŸ”„ Rounds: {r_str}"
+            f"⏳ Delay: {d}s | ⏱️ Interval: {i}m | 🔄 Rounds: {r_str}"
         )
 
     user_state[u_id] = {"step": "wiz_delay", "_created": time.time()}
     await safe_edit(
         query.message,
-        "ðŸ’€ <b>Settings Wizard</b>\n\n"
-        "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        "â”‚ âš™ï¸ <b>Step 1 of 3 â€” Group Delay</b>\n"
-        "â”‚\n"
-        "â”‚ â³ How many <b>seconds</b> to wait\n"
-        "â”‚ between sending to each group?\n"
-        "â”‚\n"
-        "â”‚ <b>Recommended:</b> 10 to 30 seconds\n"
-        "â”‚ <b>Safe:</b> 15+ seconds\n"
-        "â”‚ <b>Minimum:</b> 3 seconds\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€{current}\n\n"
+        "💀 <b>Settings Wizard</b>\n\n"
+        "┌─────────────────────\n"
+        "│ ⚙️ <b>Step 1 of 3 — Group Delay</b>\n"
+        "│\n"
+        "│ ⏳ How many <b>seconds</b> to wait\n"
+        "│ between sending to each group?\n"
+        "│\n"
+        "│ <b>Recommended:</b> 10 to 30 seconds\n"
+        "│ <b>Safe:</b> 15+ seconds\n"
+        "│ <b>Minimum:</b> 3 seconds\n"
+        f"└─────────────────────{current}\n\n"
         "Send a number (e.g. <code>15</code>):",
         InlineKeyboardMarkup([
             [
@@ -2029,7 +2029,7 @@ async def start_wizard_cb(client, query: CallbackQuery):
                 InlineKeyboardButton("20s", callback_data="quick_delay_20"),
                 InlineKeyboardButton("30s", callback_data="quick_delay_30"),
             ],
-            [InlineKeyboardButton("âŒ Cancel", callback_data="open_dash")]
+            [InlineKeyboardButton("❌ Cancel", callback_data="open_dash")]
         ])
     )
 
@@ -2046,18 +2046,18 @@ async def quick_delay_cb(client, query: CallbackQuery):
 
     await safe_edit(
         query.message,
-        f"ðŸ’€ <b>Settings Wizard</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ âœ… Delay set to <b>{delay}s</b>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ âš™ï¸ <b>Step 2 of 3 â€” Cycle Interval</b>\n"
-        f"â”‚\n"
-        f"â”‚ â±ï¸ How many <b>minutes</b> to wait\n"
-        f"â”‚ between each complete round?\n"
-        f"â”‚\n"
-        f"â”‚ <b>Recommended:</b> 60+ minutes\n"
-        f"â”‚ <b>Safe:</b> 120 minutes\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
+        f"💀 <b>Settings Wizard</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ ✅ Delay set to <b>{delay}s</b>\n"
+        f"├─────────────────────\n"
+        f"│ ⚙️ <b>Step 2 of 3 — Cycle Interval</b>\n"
+        f"│\n"
+        f"│ ⏱️ How many <b>minutes</b> to wait\n"
+        f"│ between each complete round?\n"
+        f"│\n"
+        f"│ <b>Recommended:</b> 60+ minutes\n"
+        f"│ <b>Safe:</b> 120 minutes\n"
+        f"└─────────────────────\n\n"
         f"Send a number (e.g. <code>60</code>):",
         InlineKeyboardMarkup([
             [
@@ -2065,7 +2065,7 @@ async def quick_delay_cb(client, query: CallbackQuery):
                 InlineKeyboardButton("60m", callback_data="quick_interval_60"),
                 InlineKeyboardButton("120m", callback_data="quick_interval_120"),
             ],
-            [InlineKeyboardButton("âŒ Cancel", callback_data="open_dash")]
+            [InlineKeyboardButton("❌ Cancel", callback_data="open_dash")]
         ])
     )
 
@@ -2088,18 +2088,18 @@ async def quick_interval_cb(client, query: CallbackQuery):
 
     await safe_edit(
         query.message,
-        f"ðŸ’€ <b>Settings Wizard</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ âœ… Interval set to <b>{interval_min}m</b>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ âš™ï¸ <b>Step 3 of 3 â€” Total Rounds</b>\n"
-        f"â”‚\n"
-        f"â”‚ ðŸ”„ How many times to cycle\n"
-        f"â”‚ through all target groups?\n"
-        f"â”‚\n"
-        f"â”‚ ðŸ“Š <b>Your limit:</b> {max_rounds} rounds\n"
-        f"â”‚ Or choose Unlimited below.\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
+        f"💀 <b>Settings Wizard</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ ✅ Interval set to <b>{interval_min}m</b>\n"
+        f"├─────────────────────\n"
+        f"│ ⚙️ <b>Step 3 of 3 — Total Rounds</b>\n"
+        f"│\n"
+        f"│ 🔄 How many times to cycle\n"
+        f"│ through all target groups?\n"
+        f"│\n"
+        f"│ 📊 <b>Your limit:</b> {max_rounds} rounds\n"
+        f"│ Or choose Unlimited below.\n"
+        f"└─────────────────────\n\n"
         f"Send a number (e.g. <code>10</code>):",
         InlineKeyboardMarkup([
             [
@@ -2108,10 +2108,10 @@ async def quick_interval_cb(client, query: CallbackQuery):
                 InlineKeyboardButton("25", callback_data="quick_rounds_25"),
             ],
             [InlineKeyboardButton(
-                "â™¾ï¸ Unlimited Rounds",
+                "♾️ Unlimited Rounds",
                 callback_data="set_unlimited_rounds"
             )],
-            [InlineKeyboardButton("âŒ Cancel", callback_data="open_dash")]
+            [InlineKeyboardButton("❌ Cancel", callback_data="open_dash")]
         ])
     )
 
@@ -2123,14 +2123,14 @@ async def quick_rounds_cb(client, query: CallbackQuery):
 
     if u_id not in user_state:
         return await query.answer(
-            "âš ï¸ Session expired. Please restart settings.", show_alert=True
+            "⚠️ Session expired. Please restart settings.", show_alert=True
         )
 
     plan_info = get_user_plan_info(u_id)
     max_rounds = plan_info.get("max_rounds", 5)
     if rounds > max_rounds and not is_admin(u_id):
         return await query.answer(
-            f"âš ï¸ Your plan allows max {max_rounds} rounds!",
+            f"⚠️ Your plan allows max {max_rounds} rounds!",
             show_alert=True
         )
 
@@ -2154,21 +2154,21 @@ async def quick_rounds_cb(client, query: CallbackQuery):
 
     await safe_edit(
         query.message,
-        f"ðŸ’€ <b>Settings Saved!</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ â³ <b>Group Delay:</b> {d}s\n"
-        f"â”‚ â±ï¸ <b>Cycle Interval:</b> {int(i/60)}m\n"
-        f"â”‚ ðŸ”„ <b>Total Rounds:</b> {rounds}\n"
-        f"â”‚\n"
-        f"â”‚ âœ… All settings configured!\n"
-        f"â”‚ Ready to launch your campaign.\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+        f"💀 <b>Settings Saved!</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ ⏳ <b>Group Delay:</b> {d}s\n"
+        f"│ ⏱️ <b>Cycle Interval:</b> {int(i/60)}m\n"
+        f"│ 🔄 <b>Total Rounds:</b> {rounds}\n"
+        f"│\n"
+        f"│ ✅ All settings configured!\n"
+        f"│ Ready to launch your campaign.\n"
+        f"└─────────────────────",
         InlineKeyboardMarkup([
             [InlineKeyboardButton(
-                "ðŸš€ Launch Campaign", callback_data="launch_ads"
+                "🚀 Launch Campaign", callback_data="launch_ads"
             )],
             [InlineKeyboardButton(
-                "ðŸ’» Dashboard", callback_data="open_dash"
+                "💻 Dashboard", callback_data="open_dash"
             )]
         ])
     )
@@ -2180,13 +2180,13 @@ async def unlimited_rounds_cb(client, query: CallbackQuery):
 
     if u_id not in user_state:
         return await query.answer(
-            "âš ï¸ Session expired. Please restart settings.", show_alert=True
+            "⚠️ Session expired. Please restart settings.", show_alert=True
         )
 
     plan_info = get_user_plan_info(u_id)
     if plan_info.get("max_rounds", 5) < 9999 and not is_admin(u_id):
         return await query.answer(
-            "âš ï¸ Unlimited rounds requires Pro or Elite plan!",
+            "⚠️ Unlimited rounds requires Pro or Elite plan!",
             show_alert=True
         )
 
@@ -2210,21 +2210,21 @@ async def unlimited_rounds_cb(client, query: CallbackQuery):
 
     await safe_edit(
         query.message,
-        f"ðŸ’€ <b>Settings Saved!</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ â³ <b>Group Delay:</b> {d}s\n"
-        f"â”‚ â±ï¸ <b>Cycle Interval:</b> {int(i/60)}m\n"
-        f"â”‚ ðŸ”„ <b>Rounds:</b> â™¾ï¸ Unlimited\n"
-        f"â”‚\n"
-        f"â”‚ âœ… All settings configured!\n"
-        f"â”‚ Ready to launch your campaign.\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+        f"💀 <b>Settings Saved!</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ ⏳ <b>Group Delay:</b> {d}s\n"
+        f"│ ⏱️ <b>Cycle Interval:</b> {int(i/60)}m\n"
+        f"│ 🔄 <b>Rounds:</b> ♾️ Unlimited\n"
+        f"│\n"
+        f"│ ✅ All settings configured!\n"
+        f"│ Ready to launch your campaign.\n"
+        f"└─────────────────────",
         InlineKeyboardMarkup([
             [InlineKeyboardButton(
-                "ðŸš€ Launch Campaign", callback_data="launch_ads"
+                "🚀 Launch Campaign", callback_data="launch_ads"
             )],
             [InlineKeyboardButton(
-                "ðŸ’» Dashboard", callback_data="open_dash"
+                "💻 Dashboard", callback_data="open_dash"
             )]
         ])
     )
@@ -2239,25 +2239,25 @@ async def ask_custom_links_cb(client, query: CallbackQuery):
     user_state[u_id] = {"step": "wait_custom_links", "_created": time.time()}
     await safe_edit(
         query.message,
-        "ðŸ’€ <b>Add Custom Group Links</b>\n\n"
-        "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        "â”‚ ðŸ”— Send group usernames or links.\n"
-        "â”‚ One per line, or separated by commas.\n"
-        "â”‚\n"
-        "â”‚ <b>Accepted Formats:</b>\n"
-        "â”‚ â€¢ <code>groupusername</code>\n"
-        "â”‚ â€¢ <code>@groupusername</code>\n"
-        "â”‚ â€¢ <code>https://t.me/groupname</code>\n"
-        "â”‚ â€¢ <code>t.me/groupname</code>\n"
-        "â”‚ â€¢ <code>-1001234567890</code> (Chat ID)\n"
-        "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
+        "💀 <b>Add Custom Group Links</b>\n\n"
+        "┌─────────────────────\n"
+        "│ 🔗 Send group usernames or links.\n"
+        "│ One per line, or separated by commas.\n"
+        "│\n"
+        "│ <b>Accepted Formats:</b>\n"
+        "│ • <code>groupusername</code>\n"
+        "│ • <code>@groupusername</code>\n"
+        "│ • <code>https://t.me/groupname</code>\n"
+        "│ • <code>t.me/groupname</code>\n"
+        "│ • <code>-1001234567890</code> (Chat ID)\n"
+        "└─────────────────────\n\n"
         "Send links now or /cancel:",
         InlineKeyboardMarkup([
-            [InlineKeyboardButton("âŒ Cancel", callback_data="target_menu")]
+            [InlineKeyboardButton("❌ Cancel", callback_data="target_menu")]
         ])
     )
  # =====================================================
-# ðŸš€ CAMPAIGN LAUNCH & STOP
+# 🚀 CAMPAIGN LAUNCH & STOP
 # =====================================================
 @bot.on_callback_query(filters.regex("^launch_ads$"))
 async def launch_ads_cb(client, query: CallbackQuery):
@@ -2267,7 +2267,7 @@ async def launch_ads_cb(client, query: CallbackQuery):
 
     # Rate limit launch button
     if is_rate_limited(u_id, "launch", 5):
-        return await query.answer("â³ Please wait before launching again.", show_alert=True)
+        return await query.answer("⏳ Please wait before launching again.", show_alert=True)
 
     data = get_data()
     camp = data["campaigns"].get(str(u_id), {})
@@ -2276,50 +2276,50 @@ async def launch_ads_cb(client, query: CallbackQuery):
     # Validation checks
     errors = []
     if not active_key or not active_acc:
-        errors.append("âŒ No active account selected")
+        errors.append("❌ No active account selected")
     if not camp.get("ad_html"):
-        errors.append("âŒ Ad message not set")
+        errors.append("❌ Ad message not set")
     if not camp.get("targets"):
-        errors.append("âŒ No targets configured")
+        errors.append("❌ No targets configured")
     if not camp.get("group_delay"):
-        errors.append("âŒ Settings not configured")
+        errors.append("❌ Settings not configured")
 
     if errors:
         error_text = "\n".join(errors)
         return await query.answer(
-            f"âš ï¸ Cannot launch!\n{error_text}",
+            f"⚠️ Cannot launch!\n{error_text}",
             show_alert=True
         )
 
     if camp.get("status") == "RUNNING":
         return await query.answer(
-            "âš ï¸ Campaign is already running!", show_alert=True
+            "⚠️ Campaign is already running!", show_alert=True
         )
 
     total_targets = len(camp.get("targets", []))
     total_rounds = camp.get("total_rounds", 1)
-    round_str = "â™¾ï¸" if total_rounds > 9000000 else str(total_rounds)
+    round_str = "♾️" if total_rounds > 9000000 else str(total_rounds)
 
     markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton("ðŸ›‘ Stop Campaign", callback_data="stop_ads")],
-        [InlineKeyboardButton("ðŸ”„ Refresh", callback_data="refresh_tracker")]
+        [InlineKeyboardButton("🛑 Stop Campaign", callback_data="stop_ads")],
+        [InlineKeyboardButton("🔄 Refresh", callback_data="refresh_tracker")]
     ])
 
     try:
         msg = await query.message.reply_text(
-            f"ðŸ’€ <b>Live Campaign Tracker</b>\n\n"
-            f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            f"â”‚ âš¡ Initializing engine...\n"
-            f"â”‚ ðŸŽ¯ Targets: <code>{total_targets}</code>\n"
-            f"â”‚ ðŸ”„ Rounds: <code>{round_str}</code>\n"
-            f"â”‚ Please wait...\n"
-            f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+            f"💀 <b>Live Campaign Tracker</b>\n\n"
+            f"┌─────────────────────\n"
+            f"│ ⚡ Initializing engine...\n"
+            f"│ 🎯 Targets: <code>{total_targets}</code>\n"
+            f"│ 🔄 Rounds: <code>{round_str}</code>\n"
+            f"│ Please wait...\n"
+            f"└─────────────────────",
             reply_markup=markup,
             parse_mode=ParseMode.HTML
         )
     except Exception as e:
         logger.error(f"Tracker message error: {e}")
-        return await query.answer("âŒ Failed to create tracker!", show_alert=True)
+        return await query.answer("❌ Failed to create tracker!", show_alert=True)
 
     # Update campaign state atomically
     data = await async_get_data()
@@ -2333,7 +2333,7 @@ async def launch_ads_cb(client, query: CallbackQuery):
     data["campaigns"][str(u_id)]["launch_time"] = int(time.time())
     await async_update_data(data)
 
-    await query.answer("ðŸš€ Campaign Launched!", show_alert=True)
+    await query.answer("🚀 Campaign Launched!", show_alert=True)
 
     try:
         await send_dash(query.message, u_id, is_edit=True)
@@ -2356,34 +2356,34 @@ async def stop_ads_cb(client, query: CallbackQuery):
     if was_running:
         await safe_edit(
             query.message,
-            "ðŸ’€ <b>Campaign Stopped!</b>\n\n"
-            "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            "â”‚ ðŸ›‘ All engines safely halted.\n"
-            "â”‚ Your progress has been saved.\n"
-            "â”‚ You can resume anytime.\n"
-            "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+            "💀 <b>Campaign Stopped!</b>\n\n"
+            "┌─────────────────────\n"
+            "│ 🛑 All engines safely halted.\n"
+            "│ Your progress has been saved.\n"
+            "│ You can resume anytime.\n"
+            "└─────────────────────",
             InlineKeyboardMarkup([
                 [InlineKeyboardButton(
-                    "â–¶ï¸ Resume", callback_data="launch_ads"
+                    "▶️ Resume", callback_data="launch_ads"
                 )],
                 [InlineKeyboardButton(
-                    "ðŸ”™ Dashboard", callback_data="open_dash"
+                    "🔙 Dashboard", callback_data="open_dash"
                 )]
             ])
         )
-        await query.answer("âœ… Campaign Stopped!", show_alert=True)
+        await query.answer("✅ Campaign Stopped!", show_alert=True)
     else:
-        await query.answer("â„¹ï¸ No active campaign.", show_alert=True)
+        await query.answer("ℹ️ No active campaign.", show_alert=True)
 
 
-# â”€â”€ Refresh Tracker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Refresh Tracker ───────────────────────────────────
 @bot.on_callback_query(filters.regex("^refresh_tracker$"))
 async def refresh_tracker_cb(client, query: CallbackQuery):
     u_id = query.from_user.id
 
     # Rate limit refresh spam
     if is_rate_limited(u_id, "refresh_tracker", 3):
-        return await query.answer("â³ Wait a moment...", show_alert=False)
+        return await query.answer("⏳ Wait a moment...", show_alert=False)
 
     data = get_data()
     camp = data.get("campaigns", {}).get(str(u_id), {})
@@ -2391,14 +2391,14 @@ async def refresh_tracker_cb(client, query: CallbackQuery):
 
     if camp.get("status") != "RUNNING":
         return await query.answer(
-            "â„¹ï¸ No active campaign running.", show_alert=True
+            "ℹ️ No active campaign running.", show_alert=True
         )
 
     total_targets = len(camp.get("targets", []))
     total_rounds = camp.get("total_rounds", 1)
     c_round = camp.get("current_round", 1)
     round_str = (
-        f"{c_round}/â™¾ï¸" if total_rounds > 9000000
+        f"{c_round}/♾️" if total_rounds > 9000000
         else f"{c_round}/{total_rounds}"
     )
 
@@ -2406,36 +2406,36 @@ async def refresh_tracker_cb(client, query: CallbackQuery):
     elapsed = get_readable_time(int(time.time() - launch_time))
 
     text = (
-        f"ðŸ’€ <b>Live Campaign Tracker</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸŸ¢ <b>Status:</b> RUNNING\n"
-        f"â”‚ ðŸ”„ <b>Round:</b> {round_str}\n"
-        f"â”‚ ðŸŽ¯ <b>Targets:</b> <code>{total_targets}</code>\n"
-        f"â”‚ â±ï¸ <b>Elapsed:</b> <code>{elapsed}</code>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ âœ… <b>Sent:</b> <code>{stats['total_sent']:,}</code>\n"
-        f"â”‚ âŒ <b>Failed:</b> <code>{stats['failed']:,}</code>\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        f"💀 <b>Live Campaign Tracker</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ 🟢 <b>Status:</b> RUNNING\n"
+        f"│ 🔄 <b>Round:</b> {round_str}\n"
+        f"│ 🎯 <b>Targets:</b> <code>{total_targets}</code>\n"
+        f"│ ⏱️ <b>Elapsed:</b> <code>{elapsed}</code>\n"
+        f"├─────────────────────\n"
+        f"│ ✅ <b>Sent:</b> <code>{stats['total_sent']:,}</code>\n"
+        f"│ ❌ <b>Failed:</b> <code>{stats['failed']:,}</code>\n"
+        f"└─────────────────────"
     )
 
     await safe_edit(
         query.message, text,
         InlineKeyboardMarkup([
-            [InlineKeyboardButton("ðŸ›‘ Stop", callback_data="stop_ads")],
-            [InlineKeyboardButton("ðŸ”„ Refresh", callback_data="refresh_tracker")]
+            [InlineKeyboardButton("🛑 Stop", callback_data="stop_ads")],
+            [InlineKeyboardButton("🔄 Refresh", callback_data="refresh_tracker")]
         ])
     )
-    await query.answer("âœ… Refreshed!", show_alert=False)
+    await query.answer("✅ Refreshed!", show_alert=False)
 
 
 # =====================================================
-# ðŸ¤– CAMPAIGN ENGINE
+# 🤖 CAMPAIGN ENGINE
 # =====================================================
 async def update_tracker(u_id: int, msg_id: int, text: str):
     """Update the live tracker message."""
     markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton("ðŸ›‘ Stop Campaign", callback_data="stop_ads")],
-        [InlineKeyboardButton("ðŸ”„ Refresh", callback_data="refresh_tracker")]
+        [InlineKeyboardButton("🛑 Stop Campaign", callback_data="stop_ads")],
+        [InlineKeyboardButton("🔄 Refresh", callback_data="refresh_tracker")]
     ])
     try:
         await bot.edit_message_text(
@@ -2461,7 +2461,7 @@ async def run_user_campaign(u_id: int):
             camp = data["campaigns"].get(str(u_id), {})
 
             if not camp or camp.get("status") != "RUNNING":
-                logger.info(f"Campaign stopped for user {u_id} â€” status changed")
+                logger.info(f"Campaign stopped for user {u_id} — status changed")
                 break
 
             c_rnd = camp.get("current_round", 1)
@@ -2474,11 +2474,11 @@ async def run_user_campaign(u_id: int):
                 await async_update_data(data)
                 await safe_send(
                     u_id,
-                    "ðŸ’€ <b>Campaign Complete!</b>\n\n"
-                    "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                    "â”‚ âœ… All rounds finished!\n"
-                    "â”‚ Launch again from dashboard.\n"
-                    "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+                    "💀 <b>Campaign Complete!</b>\n\n"
+                    "┌─────────────────────\n"
+                    "│ ✅ All rounds finished!\n"
+                    "│ Launch again from dashboard.\n"
+                    "└─────────────────────"
                 )
                 break
 
@@ -2494,11 +2494,11 @@ async def run_user_campaign(u_id: int):
                 await async_update_data(data)
                 await safe_send(
                     u_id,
-                    "ðŸ’€ <b>Campaign Paused!</b>\n\n"
-                    "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                    "â”‚ âš ï¸ No active account found.\n"
-                    "â”‚ Please add & select an account.\n"
-                    "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+                    "💀 <b>Campaign Paused!</b>\n\n"
+                    "┌─────────────────────\n"
+                    "│ ⚠️ No active account found.\n"
+                    "│ Please add & select an account.\n"
+                    "└─────────────────────"
                 )
                 break
 
@@ -2561,11 +2561,11 @@ async def run_user_campaign(u_id: int):
                 await async_update_data(data)
                 await safe_send(
                     u_id,
-                    "ðŸ’€ <b>Session Expired!</b>\n\n"
-                    "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                    "â”‚ âš ï¸ Session was revoked/expired.\n"
-                    "â”‚ Please login again.\n"
-                    "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+                    "💀 <b>Session Expired!</b>\n\n"
+                    "┌─────────────────────\n"
+                    "│ ⚠️ Session was revoked/expired.\n"
+                    "│ Please login again.\n"
+                    "└─────────────────────"
                 )
                 break
             except FloodWait as e:
@@ -2585,7 +2585,7 @@ async def run_user_campaign(u_id: int):
             session_expired = False
 
             round_display = (
-                f"<code>{c_rnd}</code>/â™¾ï¸"
+                f"<code>{c_rnd}</code>/♾️"
                 if t_rnd > 9000000
                 else f"<code>{c_rnd}</code>/<code>{t_rnd}</code>"
             )
@@ -2624,12 +2624,12 @@ async def run_user_campaign(u_id: int):
                     if msg_id:
                         await update_tracker(
                             u_id, msg_id,
-                            f"ðŸ’€ <b>âš ï¸ Flood Wait!</b>\n\n"
-                            f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                            f"â”‚ â³ Telegram rate limit hit.\n"
-                            f"â”‚ Waiting <code>{wait_time}s</code>...\n"
-                            f"â”‚ Campaign will auto-resume.\n"
-                            f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+                            f"💀 <b>⚠️ Flood Wait!</b>\n\n"
+                            f"┌─────────────────────\n"
+                            f"│ ⏳ Telegram rate limit hit.\n"
+                            f"│ Waiting <code>{wait_time}s</code>...\n"
+                            f"│ Campaign will auto-resume.\n"
+                            f"└─────────────────────"
                         )
                     await asyncio.sleep(wait_time)
                     fld += 1
@@ -2645,7 +2645,7 @@ async def run_user_campaign(u_id: int):
                     await async_update_data(data)
                     await safe_send(
                         u_id,
-                        "ðŸ’€ <b>Session Expired Mid-Campaign!</b>\n"
+                        "💀 <b>Session Expired Mid-Campaign!</b>\n"
                         "Please login again."
                     )
                     break
@@ -2664,19 +2664,19 @@ async def run_user_campaign(u_id: int):
                 if msg_id and (i % 3 == 0 or i == total_targets):
                     pct = round((i / total_targets) * 100)
                     filled = int(pct / 10)
-                    bar = "â–ˆ" * filled + "â–‘" * (10 - filled)
+                    bar = "█" * filled + "░" * (10 - filled)
                     tracker_text = (
-                        f"ðŸ’€ <b>Live Campaign Tracker</b>\n\n"
-                        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                        f"â”‚ ðŸ”„ <b>Round:</b> {round_display}\n"
-                        f"â”‚ ðŸŽ¯ <b>Targets:</b> <code>{total_targets}</code>\n"
-                        f"â”‚ ðŸ“ˆ <b>Progress:</b> <code>{i}/{total_targets}</code>\n"
-                        f"â”‚ [{bar}] <code>{pct}%</code>\n"
-                        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                        f"â”‚ âœ… <b>Sent:</b> <code>{snt}</code>\n"
-                        f"â”‚ â­ï¸ <b>Skipped:</b> <code>{skipped}</code>\n"
-                        f"â”‚ âŒ <b>Failed:</b> <code>{fld}</code>\n"
-                        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+                        f"💀 <b>Live Campaign Tracker</b>\n\n"
+                        f"┌─────────────────────\n"
+                        f"│ 🔄 <b>Round:</b> {round_display}\n"
+                        f"│ 🎯 <b>Targets:</b> <code>{total_targets}</code>\n"
+                        f"│ 📈 <b>Progress:</b> <code>{i}/{total_targets}</code>\n"
+                        f"│ [{bar}] <code>{pct}%</code>\n"
+                        f"├─────────────────────\n"
+                        f"│ ✅ <b>Sent:</b> <code>{snt}</code>\n"
+                        f"│ ⏭️ <b>Skipped:</b> <code>{skipped}</code>\n"
+                        f"│ ❌ <b>Failed:</b> <code>{fld}</code>\n"
+                        f"└─────────────────────"
                     )
                     await update_tracker(u_id, msg_id, tracker_text)
 
@@ -2716,13 +2716,13 @@ async def run_user_campaign(u_id: int):
                     interval = camp.get("interval", 600)
                     await safe_send(
                         u_id,
-                        f"ðŸ’€ <b>Round {c_rnd} Complete!</b>\n\n"
-                        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                        f"â”‚ âœ… Sent: <code>{snt}</code>\n"
-                        f"â”‚ â­ï¸ Skipped: <code>{skipped}</code>\n"
-                        f"â”‚ âŒ Failed: <code>{fld}</code>\n"
-                        f"â”‚ â³ Next round in <code>{int(interval/60)}m</code>\n"
-                        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+                        f"💀 <b>Round {c_rnd} Complete!</b>\n\n"
+                        f"┌─────────────────────\n"
+                        f"│ ✅ Sent: <code>{snt}</code>\n"
+                        f"│ ⏭️ Skipped: <code>{skipped}</code>\n"
+                        f"│ ❌ Failed: <code>{fld}</code>\n"
+                        f"│ ⏳ Next round in <code>{int(interval/60)}m</code>\n"
+                        f"└─────────────────────"
                     )
 
                     # Wait with periodic checks
@@ -2743,10 +2743,10 @@ async def run_user_campaign(u_id: int):
                     await async_update_data(data)
                     await safe_send(
                         u_id,
-                        "ðŸ’€ <b>Campaign Complete!</b>\n\n"
-                        "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                        "â”‚ âœ… All rounds finished!\n"
-                        "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+                        "💀 <b>Campaign Complete!</b>\n\n"
+                        "┌─────────────────────\n"
+                        "│ ✅ All rounds finished!\n"
+                        "└─────────────────────"
                     )
                     break
             else:
@@ -2766,12 +2766,12 @@ async def run_user_campaign(u_id: int):
                 await async_update_data(data)
             await safe_send(
                 u_id,
-                f"ðŸ’€ <b>Campaign Error!</b>\n\n"
-                f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                f"â”‚ âŒ Unexpected error occurred.\n"
-                f"â”‚ Campaign has been paused.\n"
-                f"â”‚ Try resuming from dashboard.\n"
-                f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+                f"💀 <b>Campaign Error!</b>\n\n"
+                f"┌─────────────────────\n"
+                f"│ ❌ Unexpected error occurred.\n"
+                f"│ Campaign has been paused.\n"
+                f"│ Try resuming from dashboard.\n"
+                f"└─────────────────────"
             )
         except Exception:
             pass
@@ -2782,8 +2782,8 @@ async def run_user_campaign(u_id: int):
 
 
 async def ad_engine():
-    """Main engine dispatcher â€” checks for campaigns to run."""
-    logger.info("ðŸ”¥ Ad Engine started!")
+    """Main engine dispatcher — checks for campaigns to run."""
+    logger.info("🔥 Ad Engine started!")
     while True:
         try:
             data = get_data()
@@ -2804,7 +2804,7 @@ async def ad_engine():
 
 
 # =====================================================
-# âŒ¨ï¸ BASIC COMMANDS
+# ⌨️ BASIC COMMANDS
 # =====================================================
 @bot.on_message(filters.command("cancel") & filters.private)
 async def cancel_cmd(client, message: Message):
@@ -2820,10 +2820,10 @@ async def cancel_cmd(client, message: Message):
                 pass
         del user_state[u_id]
     await message.reply_text(
-        "âŒ <b>Action Cancelled.</b>",
+        "❌ <b>Action Cancelled.</b>",
         reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("ðŸ’» Dashboard", callback_data="open_dash")],
-            [InlineKeyboardButton("ðŸ  Main Menu", callback_data="back_start")]
+            [InlineKeyboardButton("💻 Dashboard", callback_data="open_dash")],
+            [InlineKeyboardButton("🏠 Main Menu", callback_data="back_start")]
         ]),
         parse_mode=ParseMode.HTML
     )
@@ -2847,15 +2847,15 @@ async def reset_cmd(client, message: Message):
         data["campaigns"][str(u_id)]["status"] = "PAUSED"
         await async_update_data(data)
     await message.reply_text(
-        "ðŸ’€ <b>System Reset!</b>\n\n"
-        "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        "â”‚ âœ… All stuck states cleared.\n"
-        "â”‚ âœ… Campaign paused safely.\n"
-        "â”‚ âœ… Ready for fresh start!\n"
-        "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+        "💀 <b>System Reset!</b>\n\n"
+        "┌─────────────────────\n"
+        "│ ✅ All stuck states cleared.\n"
+        "│ ✅ Campaign paused safely.\n"
+        "│ ✅ Ready for fresh start!\n"
+        "└─────────────────────",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton(
-                "ðŸ’» Open Dashboard", callback_data="open_dash"
+                "💻 Open Dashboard", callback_data="open_dash"
             )]
         ]),
         parse_mode=ParseMode.HTML
@@ -2870,7 +2870,7 @@ async def ping_cmd(client, message: Message):
 
     start_t = time.time()
     rm = await message.reply_text(
-        "ðŸ”„ <b>Checking...</b>", parse_mode=ParseMode.HTML
+        "🔄 <b>Checking...</b>", parse_mode=ParseMode.HTML
     )
     ping_ms = round((time.time() - start_t) * 1000, 2)
     up = get_readable_time(int(time.time() - BOT_START_TIME))
@@ -2886,19 +2886,19 @@ async def ping_cmd(client, message: Message):
     ) if os.path.exists(DATA_FILE) else "0 B"
 
     await rm.edit_text(
-        f"ðŸ’€ <b>Skull Ads â€” System Status</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ âš¡ <b>Ping:</b> <code>{ping_ms} ms</code>\n"
-        f"â”‚ â±ï¸ <b>Uptime:</b> <code>{up}</code>\n"
-        f"â”‚ ðŸ–¥ï¸ <b>Server:</b> Online ðŸŸ¢\n"
-        f"â”‚ ðŸ’¾ <b>Storage:</b> <code>{db_size}</code> ðŸŸ¢\n"
-        f"â”‚ ðŸ¤– <b>Engine:</b> Active ðŸŸ¢\n"
-        f"â”‚ ðŸš€ <b>Campaigns:</b> <code>{running}</code> running\n"
-        f"â”‚ âš¡ <b>Tasks:</b> <code>{len(active_tasks)}</code> active\n"
-        f"â”‚ ðŸ‘¥ <b>Users:</b> <code>{total_users}</code>\n"
-        f"â”‚ ðŸ”‘ <b>Sessions:</b> <code>{total_accounts}</code>\n"
-        f"â”‚ ðŸ¤– <b>Version:</b> <code>v{BOT_VERSION}</code>\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+        f"💀 <b>Skull Ads — System Status</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ ⚡ <b>Ping:</b> <code>{ping_ms} ms</code>\n"
+        f"│ ⏱️ <b>Uptime:</b> <code>{up}</code>\n"
+        f"│ 🖥️ <b>Server:</b> Online 🟢\n"
+        f"│ 💾 <b>Storage:</b> <code>{db_size}</code> 🟢\n"
+        f"│ 🤖 <b>Engine:</b> Active 🟢\n"
+        f"│ 🚀 <b>Campaigns:</b> <code>{running}</code> running\n"
+        f"│ ⚡ <b>Tasks:</b> <code>{len(active_tasks)}</code> active\n"
+        f"│ 👥 <b>Users:</b> <code>{total_users}</code>\n"
+        f"│ 🔑 <b>Sessions:</b> <code>{total_accounts}</code>\n"
+        f"│ 🤖 <b>Version:</b> <code>v{BOT_VERSION}</code>\n"
+        f"└─────────────────────",
         parse_mode=ParseMode.HTML
     )
 
@@ -2909,13 +2909,13 @@ async def myid_cmd(client, message: Message):
     name = message.from_user.first_name or "Unknown"
     uname = f"@{message.from_user.username}" if message.from_user.username else "None"
     await message.reply_text(
-        f"ðŸ’€ <b>Your Info</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ‘¤ <b>Name:</b> {sanitize_html(name)}\n"
-        f"â”‚ ðŸ†” <b>ID:</b> <code>{u_id}</code>\n"
-        f"â”‚ ðŸ”— <b>Username:</b> {uname}\n"
-        f"â”‚ ðŸ’Ž <b>Plan:</b> {get_user_plan_name(u_id)}\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+        f"💀 <b>Your Info</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ 👤 <b>Name:</b> {sanitize_html(name)}\n"
+        f"│ 🆔 <b>ID:</b> <code>{u_id}</code>\n"
+        f"│ 🔗 <b>Username:</b> {uname}\n"
+        f"│ 💎 <b>Plan:</b> {get_user_plan_name(u_id)}\n"
+        f"└─────────────────────",
         parse_mode=ParseMode.HTML
     )
 
@@ -2923,35 +2923,35 @@ async def myid_cmd(client, message: Message):
 @bot.on_message(filters.command("help") & filters.private)
 async def help_cmd(client, message: Message):
     await message.reply_text(
-        "ðŸ“– <b>Commands</b>\n\n"
-        "/start â€” Main menu\n"
-        "/ping â€” Bot status\n"
-        "/reset â€” Reset stuck states\n"
-        "/cancel â€” Cancel action\n"
-        "/myid â€” Your user ID\n"
-        "/help â€” This message\n"
-        "/referral â€” Referral link\n\n"
+        "📖 <b>Commands</b>\n\n"
+        "/start — Main menu\n"
+        "/ping — Bot status\n"
+        "/reset — Reset stuck states\n"
+        "/cancel — Cancel action\n"
+        "/myid — Your user ID\n"
+        "/help — This message\n"
+        "/referral — Referral link\n\n"
         "<b>Admin Only:</b>\n"
-        "/panel â€” Admin panel\n"
-        "/ban â€” Ban user\n"
-        "/unban â€” Unban user\n"
-        "/addpremium â€” Add premium\n"
-        "/removepremium â€” Remove premium\n"
-        "/broadcast â€” Broadcast msg\n"
-        "/maintenance â€” Toggle maintenance\n"
-        "/pauseall â€” Pause all campaigns\n"
-        "/resumeall â€” Resume campaigns\n"
-        "/getdb â€” Download database\n"
-        "/uploaddb â€” Restore database\n"
-        "/userinfo â€” User details\n"
-        "/listusers â€” List all users\n"
-        "/listpremium â€” List premium\n"
-        "/listbanned â€” List banned\n"
-        "/searchuser â€” Search users\n"
-        "/resetdb â€” Reset database\n"
-        "/globalfooter â€” Set ad footer\n"
-        "/forcejoin â€” Set force join\n"
-        "/logs â€” Admin action logs",
+        "/panel — Admin panel\n"
+        "/ban — Ban user\n"
+        "/unban — Unban user\n"
+        "/addpremium — Add premium\n"
+        "/removepremium — Remove premium\n"
+        "/broadcast — Broadcast msg\n"
+        "/maintenance — Toggle maintenance\n"
+        "/pauseall — Pause all campaigns\n"
+        "/resumeall — Resume campaigns\n"
+        "/getdb — Download database\n"
+        "/uploaddb — Restore database\n"
+        "/userinfo — User details\n"
+        "/listusers — List all users\n"
+        "/listpremium — List premium\n"
+        "/listbanned — List banned\n"
+        "/searchuser — Search users\n"
+        "/resetdb — Reset database\n"
+        "/globalfooter — Set ad footer\n"
+        "/forcejoin — Set force join\n"
+        "/logs — Admin action logs",
         parse_mode=ParseMode.HTML
     )
 
@@ -2963,9 +2963,9 @@ async def referral_cmd(client, message: Message):
     ref_count = len(data.get("referrals", {}).get(str(u_id), []))
     ref_link = f"https://t.me/{BOT_USERNAME}?start=ref_{u_id}"
     await message.reply_text(
-        f"ðŸ’€ <b>Your Referral Link</b>\n\n"
-        f"ðŸ”— <code>{ref_link}</code>\n\n"
-        f"ðŸ‘¥ Total Referrals: <code>{ref_count}</code>",
+        f"💀 <b>Your Referral Link</b>\n\n"
+        f"🔗 <code>{ref_link}</code>\n\n"
+        f"👥 Total Referrals: <code>{ref_count}</code>",
         parse_mode=ParseMode.HTML
     )
 
@@ -2976,7 +2976,7 @@ async def noop_cb(client, query: CallbackQuery):
 
 
 # =====================================================
-# âŒ¨ï¸ MASTER INPUT HANDLER â€” FIXED OTP & PHONE
+# ⌨️ MASTER INPUT HANDLER — FIXED OTP & PHONE
 # =====================================================
 ADMIN_COMMANDS = [
     "start", "cancel", "reset", "ping", "help", "myid", "referral",
@@ -3007,8 +3007,8 @@ async def master_handler(client, message: Message):
     step = user_state[u_id].get("step")
     text = message.text.strip() if message.text else ""
 
-    # â”€â”€ PHONE NUMBER â€” Fixed with normalization â”€â”€â”€
-       # â”€â”€ PHONE NUMBER â€” BULLETPROOF â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── PHONE NUMBER — Fixed with normalization ───
+       # ── PHONE NUMBER — BULLETPROOF ────────────────
     if step == "wait_phone":
         # Get raw text safely
         raw_text = ""
@@ -3021,7 +3021,7 @@ async def master_handler(client, message: Message):
 
         if not raw_text:
             return await message.reply_text(
-                "âŒ Please send your phone number as text.",
+                "❌ Please send your phone number as text.",
                 parse_mode=ParseMode.HTML
             )
 
@@ -3037,20 +3037,20 @@ async def master_handler(client, message: Message):
                 if u_id in user_state:
                     del user_state[u_id]
                 return await message.reply_text(
-                    f"âš ï¸ <b>This phone is already linked!</b>\n"
-                    f"ðŸ“± <tg-spoiler>{phone}</tg-spoiler>",
+                    f"⚠️ <b>This phone is already linked!</b>\n"
+                    f"📱 <tg-spoiler>{phone}</tg-spoiler>",
                     reply_markup=InlineKeyboardMarkup([
                         [InlineKeyboardButton(
-                            "ðŸ‘¥ Accounts", callback_data="accounts_menu"
+                            "👥 Accounts", callback_data="accounts_menu"
                         )]
                     ]),
                     parse_mode=ParseMode.HTML
                 )
 
         w_msg = await message.reply_text(
-            f"ðŸ’€ <b>Connecting to Telegram...</b>\n"
-            f"ðŸ“± Number: <tg-spoiler>{phone}</tg-spoiler>\n"
-            f"â³ Sending OTP...",
+            f"💀 <b>Connecting to Telegram...</b>\n"
+            f"📱 Number: <tg-spoiler>{phone}</tg-spoiler>\n"
+            f"⏳ Sending OTP...",
             parse_mode=ParseMode.HTML
         )
 
@@ -3076,20 +3076,20 @@ async def master_handler(client, message: Message):
             logger.info(f"OTP sent successfully to {u_id} for {phone}")
 
             await w_msg.edit_text(
-                "ðŸ’€ <b>OTP Sent! âœ…</b>\n\n"
-                "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                "â”‚ ðŸ“© Check your Telegram app.\n"
-                "â”‚\n"
-                "â”‚ <b>Just type the OTP normally:</b>\n"
-                "â”‚\n"
-                "â”‚ âœ… <code>12345</code> â€” works!\n"
-                "â”‚ âœ… <code>1 2 3 4 5</code> â€” works!\n"
-                "â”‚ âœ… <code>1-2-3-4-5</code> â€” works!\n"
-                "â”‚ âœ… <code>12 345</code> â€” works!\n"
-                "â”‚\n"
-                "â”‚ ðŸ’¡ Bot auto-detects digits.\n"
-                "â”‚ âš ï¸ OTP expires in 2 minutes!\n"
-                "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+                "💀 <b>OTP Sent! ✅</b>\n\n"
+                "┌─────────────────────\n"
+                "│ 📩 Check your Telegram app.\n"
+                "│\n"
+                "│ <b>Just type the OTP normally:</b>\n"
+                "│\n"
+                "│ ✅ <code>12345</code> — works!\n"
+                "│ ✅ <code>1 2 3 4 5</code> — works!\n"
+                "│ ✅ <code>1-2-3-4-5</code> — works!\n"
+                "│ ✅ <code>12 345</code> — works!\n"
+                "│\n"
+                "│ 💡 Bot auto-detects digits.\n"
+                "│ ⚠️ OTP expires in 2 minutes!\n"
+                "└─────────────────────",
                 parse_mode=ParseMode.HTML
             )
 
@@ -3101,14 +3101,14 @@ async def master_handler(client, message: Message):
             if u_id in user_state:
                 del user_state[u_id]
             await w_msg.edit_text(
-                f"ðŸ’€ <b>Rate Limited!</b>\n\n"
-                f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                f"â”‚ â³ Telegram says wait\n"
-                f"â”‚ <code>{e.value}</code> seconds.\n"
-                f"â”‚ Try again after that.\n"
-                f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+                f"💀 <b>Rate Limited!</b>\n\n"
+                f"┌─────────────────────\n"
+                f"│ ⏳ Telegram says wait\n"
+                f"│ <code>{e.value}</code> seconds.\n"
+                f"│ Try again after that.\n"
+                f"└─────────────────────",
                 reply_markup=InlineKeyboardMarkup([
-                    [InlineKeyboardButton("ðŸ” Retry", callback_data="login_acc")]
+                    [InlineKeyboardButton("🔁 Retry", callback_data="login_acc")]
                 ]),
                 parse_mode=ParseMode.HTML
             )
@@ -3127,61 +3127,61 @@ async def master_handler(client, message: Message):
             # Handle specific errors
             if "PHONE_NUMBER_INVALID" in error_str.upper():
                 await w_msg.edit_text(
-                    "ðŸ’€ <b>Invalid Phone Number!</b>\n\n"
-                    "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                    "â”‚ âŒ Telegram rejected this number.\n"
-                    "â”‚ Make sure country code is correct.\n"
-                    "â”‚\n"
-                    "â”‚ <b>Examples:</b>\n"
-                    "â”‚ â€¢ <code>+919876543210</code> (India)\n"
-                    "â”‚ â€¢ <code>+12025551234</code> (US)\n"
-                    "â”‚ â€¢ <code>+447911123456</code> (UK)\n"
-                    "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+                    "💀 <b>Invalid Phone Number!</b>\n\n"
+                    "┌─────────────────────\n"
+                    "│ ❌ Telegram rejected this number.\n"
+                    "│ Make sure country code is correct.\n"
+                    "│\n"
+                    "│ <b>Examples:</b>\n"
+                    "│ • <code>+919876543210</code> (India)\n"
+                    "│ • <code>+12025551234</code> (US)\n"
+                    "│ • <code>+447911123456</code> (UK)\n"
+                    "└─────────────────────",
                     reply_markup=InlineKeyboardMarkup([
-                        [InlineKeyboardButton("ðŸ” Retry", callback_data="login_acc")]
+                        [InlineKeyboardButton("🔁 Retry", callback_data="login_acc")]
                     ]),
                     parse_mode=ParseMode.HTML
                 )
             elif "PHONE_NUMBER_BANNED" in error_str.upper():
                 await w_msg.edit_text(
-                    "ðŸ’€ <b>Phone Number Banned!</b>\n\n"
-                    "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                    "â”‚ ðŸš« This number is banned by Telegram.\n"
-                    "â”‚ Try a different number.\n"
-                    "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+                    "💀 <b>Phone Number Banned!</b>\n\n"
+                    "┌─────────────────────\n"
+                    "│ 🚫 This number is banned by Telegram.\n"
+                    "│ Try a different number.\n"
+                    "└─────────────────────",
                     reply_markup=InlineKeyboardMarkup([
-                        [InlineKeyboardButton("ðŸ” Try Another", callback_data="login_acc")]
+                        [InlineKeyboardButton("🔁 Try Another", callback_data="login_acc")]
                     ]),
                     parse_mode=ParseMode.HTML
                 )
             else:
                 await w_msg.edit_text(
-                    f"ðŸ’€ <b>Connection Failed!</b>\n\n"
-                    f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                    f"â”‚ âŒ {sanitize_html(error_str[:150])}\n"
-                    f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+                    f"💀 <b>Connection Failed!</b>\n\n"
+                    f"┌─────────────────────\n"
+                    f"│ ❌ {sanitize_html(error_str[:150])}\n"
+                    f"└─────────────────────",
                     reply_markup=InlineKeyboardMarkup([
-                        [InlineKeyboardButton("ðŸ” Retry", callback_data="login_acc")]
+                        [InlineKeyboardButton("🔁 Retry", callback_data="login_acc")]
                     ]),
                     parse_mode=ParseMode.HTML
                 )
-      # â”€â”€ OTP â€” BULLETPROOF FIX â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      # ── OTP — BULLETPROOF FIX ─────────────────────
     elif step == "wait_otp":
         tc = user_state[u_id].get("client")
         if not tc:
             if u_id in user_state:
                 del user_state[u_id]
             return await message.reply_text(
-                "âŒ Session expired. Please try again.",
+                "❌ Session expired. Please try again.",
                 reply_markup=InlineKeyboardMarkup([
                     [InlineKeyboardButton(
-                        "ðŸ” Retry", callback_data="login_acc"
+                        "🔁 Retry", callback_data="login_acc"
                     )]
                 ]),
                 parse_mode=ParseMode.HTML
             )
 
-        # Get raw text â€” handle None safely
+        # Get raw text — handle None safely
         raw_text = ""
         if message.text:
             raw_text = message.text
@@ -3192,19 +3192,19 @@ async def master_handler(client, message: Message):
 
         if not raw_text:
             return await message.reply_text(
-                "âŒ <b>Please type the OTP code.</b>\n\n"
+                "❌ <b>Please type the OTP code.</b>\n\n"
                 "Example: <code>12345</code>",
                 parse_mode=ParseMode.HTML
             )
 
-        # Normalize OTP â€” extracts digits from ANY format
+        # Normalize OTP — extracts digits from ANY format
         otp, error = normalize_otp(raw_text)
         if error:
             return await message.reply_text(error, parse_mode=ParseMode.HTML)
 
         # Show processing message
         proc_msg = await message.reply_text(
-            "ðŸ’€ <b>Verifying OTP...</b> â³",
+            "💀 <b>Verifying OTP...</b> ⏳",
             parse_mode=ParseMode.HTML
         )
 
@@ -3237,13 +3237,13 @@ async def master_handler(client, message: Message):
 
             user_state[u_id]["step"] = "wait_pass"
             await message.reply_text(
-                "ðŸ’€ <b>2FA Password Required!</b>\n\n"
-                "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                "â”‚ ðŸ” Your account has Two-Factor\n"
-                "â”‚ Authentication enabled.\n"
-                "â”‚\n"
-                "â”‚ Send your 2FA password now:\n"
-                "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+                "💀 <b>2FA Password Required!</b>\n\n"
+                "┌─────────────────────\n"
+                "│ 🔐 Your account has Two-Factor\n"
+                "│ Authentication enabled.\n"
+                "│\n"
+                "│ Send your 2FA password now:\n"
+                "└─────────────────────",
                 parse_mode=ParseMode.HTML
             )
 
@@ -3265,19 +3265,19 @@ async def master_handler(client, message: Message):
                 if u_id in user_state:
                     del user_state[u_id]
                 return await message.reply_text(
-                    "ðŸ’€ <b>OTP Expired!</b>\n\n"
-                    "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                    "â”‚ â° The OTP has expired.\n"
-                    "â”‚ Please start login again.\n"
-                    "â”‚\n"
-                    "â”‚ ðŸ’¡ <b>Next time send OTP like:</b>\n"
-                    "â”‚ â€¢ <code>5 0 8 5 9</code>\n"
-                    "â”‚ â€¢ <code>1 2 3 4 5</code>\n"
-                    "â”‚ â€¢ <code>1-2-3-4-5</code>\n"
-                    "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+                    "💀 <b>OTP Expired!</b>\n\n"
+                    "┌─────────────────────\n"
+                    "│ ⏰ The OTP has expired.\n"
+                    "│ Please start login again.\n"
+                    "│\n"
+                    "│ 💡 <b>Next time send OTP like:</b>\n"
+                    "│ • <code>5 0 8 5 9</code>\n"
+                    "│ • <code>1 2 3 4 5</code>\n"
+                    "│ • <code>1-2-3-4-5</code>\n"
+                    "└─────────────────────",
                     reply_markup=InlineKeyboardMarkup([
                         [InlineKeyboardButton(
-                            "ðŸ” Login Again", callback_data="login_acc"
+                            "🔁 Login Again", callback_data="login_acc"
                         )]
                     ]),
                     parse_mode=ParseMode.HTML
@@ -3286,19 +3286,19 @@ async def master_handler(client, message: Message):
             # Check if OTP is wrong
             if "PHONE_CODE_INVALID" in error_str.upper():
                 return await message.reply_text(
-                    "ðŸ’€ <b>Wrong OTP!</b>\n\n"
-                    "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                    "â”‚ âŒ The code you entered is wrong.\n"
-                    "â”‚ Check your Telegram app and\n"
-                    "â”‚ send the correct OTP.\n"
-                    "â”‚\n"
-                    "â”‚ Just type the digits:\n"
-                    "â”‚ Example: <code>12345</code>\n"
-                    "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+                    "💀 <b>Wrong OTP!</b>\n\n"
+                    "┌─────────────────────\n"
+                    "│ ❌ The code you entered is wrong.\n"
+                    "│ Check your Telegram app and\n"
+                    "│ send the correct OTP.\n"
+                    "│\n"
+                    "│ Just type the digits:\n"
+                    "│ Example: <code>12345</code>\n"
+                    "└─────────────────────",
                     parse_mode=ParseMode.HTML
                 )
 
-            # Other errors â€” cleanup and retry
+            # Other errors — cleanup and retry
             try:
                 await tc.disconnect()
             except Exception:
@@ -3307,26 +3307,26 @@ async def master_handler(client, message: Message):
                 del user_state[u_id]
 
             await message.reply_text(
-                f"ðŸ’€ <b>Login Error!</b>\n\n"
-                f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                f"â”‚ âŒ {sanitize_html(error_str[:150])}\n"
-                f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+                f"💀 <b>Login Error!</b>\n\n"
+                f"┌─────────────────────\n"
+                f"│ ❌ {sanitize_html(error_str[:150])}\n"
+                f"└─────────────────────",
                 reply_markup=InlineKeyboardMarkup([
                     [InlineKeyboardButton(
-                        "ðŸ” Retry", callback_data="login_acc"
+                        "🔁 Retry", callback_data="login_acc"
                     )]
                 ]),
                 parse_mode=ParseMode.HTML
             )
 
-    # â”€â”€ 2FA PASSWORD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── 2FA PASSWORD ──────────────────────────────
     elif step == "wait_pass":
         tc = user_state[u_id].get("client")
         if not tc:
             if u_id in user_state:
                 del user_state[u_id]
             return await message.reply_text(
-                "âŒ Session expired. Please try again.",
+                "❌ Session expired. Please try again.",
                 parse_mode=ParseMode.HTML
             )
         try:
@@ -3343,19 +3343,19 @@ async def master_handler(client, message: Message):
                 del user_state[u_id]
             logger.warning(f"2FA check_password error for {u_id}: {e}")
             await message.reply_text(
-                f"ðŸ’€ <b>Wrong Password!</b>\n\n"
-                f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                f"â”‚ âŒ {sanitize_html(str(e)[:150])}\n"
-                f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
+                f"💀 <b>Wrong Password!</b>\n\n"
+                f"┌─────────────────────\n"
+                f"│ ❌ {sanitize_html(str(e)[:150])}\n"
+                f"└─────────────────────\n\n"
                 f"Try again with /start",
                 parse_mode=ParseMode.HTML
             )
 
-    # â”€â”€ SETTINGS STEP 1: DELAY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── SETTINGS STEP 1: DELAY ────────────────────
     elif step == "wiz_delay":
         if not text.isdigit() or int(text) < 3:
             return await message.reply_text(
-                "âŒ <b>Invalid!</b> Minimum 3 seconds.\n"
+                "❌ <b>Invalid!</b> Minimum 3 seconds.\n"
                 "Send a number (e.g. <code>15</code>)",
                 parse_mode=ParseMode.HTML
             )
@@ -3364,18 +3364,18 @@ async def master_handler(client, message: Message):
             "delay": delay_val, "step": "wiz_interval"
         })
         await message.reply_text(
-            f"ðŸ’€ <b>Settings Wizard</b>\n\n"
-            f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            f"â”‚ âœ… Delay set to <b>{delay_val}s</b>\n"
-            f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            f"â”‚ âš™ï¸ <b>Step 2 of 3 â€” Cycle Interval</b>\n"
-            f"â”‚\n"
-            f"â”‚ â±ï¸ How many <b>minutes</b> to wait\n"
-            f"â”‚ between each complete round?\n"
-            f"â”‚\n"
-            f"â”‚ <b>Recommended:</b> 60+ minutes\n"
-            f"â”‚ <b>Safe:</b> 120 minutes\n"
-            f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
+            f"💀 <b>Settings Wizard</b>\n\n"
+            f"┌─────────────────────\n"
+            f"│ ✅ Delay set to <b>{delay_val}s</b>\n"
+            f"├─────────────────────\n"
+            f"│ ⚙️ <b>Step 2 of 3 — Cycle Interval</b>\n"
+            f"│\n"
+            f"│ ⏱️ How many <b>minutes</b> to wait\n"
+            f"│ between each complete round?\n"
+            f"│\n"
+            f"│ <b>Recommended:</b> 60+ minutes\n"
+            f"│ <b>Safe:</b> 120 minutes\n"
+            f"└─────────────────────\n\n"
             f"Send a number (e.g. <code>60</code>):",
             reply_markup=InlineKeyboardMarkup([
                 [
@@ -3390,17 +3390,17 @@ async def master_handler(client, message: Message):
                     ),
                 ],
                 [InlineKeyboardButton(
-                    "âŒ Cancel", callback_data="open_dash"
+                    "❌ Cancel", callback_data="open_dash"
                 )]
             ]),
             parse_mode=ParseMode.HTML
         )
 
-    # â”€â”€ SETTINGS STEP 2: INTERVAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── SETTINGS STEP 2: INTERVAL ─────────────────
     elif step == "wiz_interval":
         if not text.isdigit() or int(text) < 1:
             return await message.reply_text(
-                "âŒ <b>Invalid!</b> Minimum 1 minute.\n"
+                "❌ <b>Invalid!</b> Minimum 1 minute.\n"
                 "Send a number (e.g. <code>60</code>)",
                 parse_mode=ParseMode.HTML
             )
@@ -3414,16 +3414,16 @@ async def master_handler(client, message: Message):
         max_rounds = plan_info.get("max_rounds", 5)
 
         await message.reply_text(
-            f"ðŸ’€ <b>Settings Wizard</b>\n\n"
-            f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            f"â”‚ âœ… Interval set to <b>{int(interval_val/60)}m</b>\n"
-            f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            f"â”‚ âš™ï¸ <b>Step 3 of 3 â€” Total Rounds</b>\n"
-            f"â”‚\n"
-            f"â”‚ ðŸ”„ How many times to cycle?\n"
-            f"â”‚ ðŸ“Š <b>Your limit:</b> {max_rounds}\n"
-            f"â”‚ Or choose Unlimited below.\n"
-            f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
+            f"💀 <b>Settings Wizard</b>\n\n"
+            f"┌─────────────────────\n"
+            f"│ ✅ Interval set to <b>{int(interval_val/60)}m</b>\n"
+            f"├─────────────────────\n"
+            f"│ ⚙️ <b>Step 3 of 3 — Total Rounds</b>\n"
+            f"│\n"
+            f"│ 🔄 How many times to cycle?\n"
+            f"│ 📊 <b>Your limit:</b> {max_rounds}\n"
+            f"│ Or choose Unlimited below.\n"
+            f"└─────────────────────\n\n"
             f"Send a number (e.g. <code>10</code>):",
             reply_markup=InlineKeyboardMarkup([
                 [
@@ -3438,21 +3438,21 @@ async def master_handler(client, message: Message):
                     ),
                 ],
                 [InlineKeyboardButton(
-                    "â™¾ï¸ Unlimited",
+                    "♾️ Unlimited",
                     callback_data="set_unlimited_rounds"
                 )],
                 [InlineKeyboardButton(
-                    "âŒ Cancel", callback_data="open_dash"
+                    "❌ Cancel", callback_data="open_dash"
                 )]
             ]),
             parse_mode=ParseMode.HTML
         )
 
-    # â”€â”€ SETTINGS STEP 3: ROUNDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── SETTINGS STEP 3: ROUNDS ───────────────────
     elif step == "wiz_rounds":
         if not text.isdigit() or int(text) < 1:
             return await message.reply_text(
-                "âŒ <b>Invalid!</b> Minimum 1 round.\n"
+                "❌ <b>Invalid!</b> Minimum 1 round.\n"
                 "Send a number (e.g. <code>10</code>)",
                 parse_mode=ParseMode.HTML
             )
@@ -3463,11 +3463,11 @@ async def master_handler(client, message: Message):
 
         if rounds_val > max_rounds and not is_admin(u_id):
             return await message.reply_text(
-                f"âš ï¸ Your plan allows max <b>{max_rounds}</b> rounds!\n"
+                f"⚠️ Your plan allows max <b>{max_rounds}</b> rounds!\n"
                 f"Upgrade to increase limit.",
                 reply_markup=InlineKeyboardMarkup([
                     [InlineKeyboardButton(
-                        "ðŸ’Ž Upgrade", callback_data="show_plans"
+                        "💎 Upgrade", callback_data="show_plans"
                     )]
                 ]),
                 parse_mode=ParseMode.HTML
@@ -3491,26 +3491,26 @@ async def master_handler(client, message: Message):
             del user_state[u_id]
 
         await message.reply_text(
-            f"ðŸ’€ <b>Settings Saved!</b>\n\n"
-            f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            f"â”‚ â³ <b>Group Delay:</b> {d}s\n"
-            f"â”‚ â±ï¸ <b>Cycle Interval:</b> {int(i/60)}m\n"
-            f"â”‚ ðŸ”„ <b>Total Rounds:</b> {rounds_val}\n"
-            f"â”‚\n"
-            f"â”‚ âœ… All settings configured!\n"
-            f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+            f"💀 <b>Settings Saved!</b>\n\n"
+            f"┌─────────────────────\n"
+            f"│ ⏳ <b>Group Delay:</b> {d}s\n"
+            f"│ ⏱️ <b>Cycle Interval:</b> {int(i/60)}m\n"
+            f"│ 🔄 <b>Total Rounds:</b> {rounds_val}\n"
+            f"│\n"
+            f"│ ✅ All settings configured!\n"
+            f"└─────────────────────",
             reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton(
-                    "ðŸš€ Launch Campaign", callback_data="launch_ads"
+                    "🚀 Launch Campaign", callback_data="launch_ads"
                 )],
                 [InlineKeyboardButton(
-                    "ðŸ’» Dashboard", callback_data="open_dash"
+                    "💻 Dashboard", callback_data="open_dash"
                 )]
             ]),
             parse_mode=ParseMode.HTML
         )
 
-    # â”€â”€ CUSTOM LINKS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── CUSTOM LINKS ──────────────────────────────
     elif step == "wait_custom_links":
         raw = text.replace(",", "\n").replace(" ", "\n").split("\n")
         links = []
@@ -3529,7 +3529,7 @@ async def master_handler(client, message: Message):
 
         if not links:
             return await message.reply_text(
-                "âŒ <b>No valid links found!</b>\n\n"
+                "❌ <b>No valid links found!</b>\n\n"
                 "Send group usernames or t.me links.",
                 parse_mode=ParseMode.HTML
             )
@@ -3549,23 +3549,23 @@ async def master_handler(client, message: Message):
             del user_state[u_id]
 
         await message.reply_text(
-            f"ðŸ’€ <b>Custom Targets Saved!</b>\n\n"
-            f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            f"â”‚ âœ… <b>{len(links)}</b> group(s) added.\n"
-            f"â”‚ Ready to use in campaigns!\n"
-            f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+            f"💀 <b>Custom Targets Saved!</b>\n\n"
+            f"┌─────────────────────\n"
+            f"│ ✅ <b>{len(links)}</b> group(s) added.\n"
+            f"│ Ready to use in campaigns!\n"
+            f"└─────────────────────",
             reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton(
-                    "ðŸš€ Launch Campaign", callback_data="launch_ads"
+                    "🚀 Launch Campaign", callback_data="launch_ads"
                 )],
                 [InlineKeyboardButton(
-                    "ðŸ’» Dashboard", callback_data="open_dash"
+                    "💻 Dashboard", callback_data="open_dash"
                 )]
             ]),
             parse_mode=ParseMode.HTML
         )
 
-    # â”€â”€ AD MESSAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── AD MESSAGE ────────────────────────────────
     elif step == "wait_ad_msg":
         html_content = ""
         if message.text:
@@ -3581,7 +3581,7 @@ async def master_handler(client, message: Message):
 
         if not html_content:
             return await message.reply_text(
-                "âŒ <b>Please send a text message</b> as your ad.\n\n"
+                "❌ <b>Please send a text message</b> as your ad.\n\n"
                 "Media-only messages are not supported yet.",
                 parse_mode=ParseMode.HTML
             )
@@ -3597,24 +3597,24 @@ async def master_handler(client, message: Message):
 
         preview = truncate_text(html_content, 100)
         await message.reply_text(
-            f"ðŸ’€ <b>Ad Message Saved!</b>\n\n"
-            f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            f"â”‚ âœ… Ad message is ready.\n"
-            f"â”‚ ðŸ“ Length: <code>{len(html_content)}</code> chars\n"
-            f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
+            f"💀 <b>Ad Message Saved!</b>\n\n"
+            f"┌─────────────────────\n"
+            f"│ ✅ Ad message is ready.\n"
+            f"│ 📝 Length: <code>{len(html_content)}</code> chars\n"
+            f"└─────────────────────\n\n"
             f"<b>Preview:</b>\n<blockquote>{preview}</blockquote>",
             reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton(
-                    "ðŸš€ Launch Campaign", callback_data="launch_ads"
+                    "🚀 Launch Campaign", callback_data="launch_ads"
                 )],
                 [InlineKeyboardButton(
-                    "ðŸ’» Dashboard", callback_data="open_dash"
+                    "💻 Dashboard", callback_data="open_dash"
                 )]
             ]),
             parse_mode=ParseMode.HTML
         )
 
-    # â”€â”€ ADMIN: CONFIRM RESET DB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── ADMIN: CONFIRM RESET DB ───────────────────
     elif step == "adm_confirm_reset":
         if not is_admin(u_id):
             if u_id in user_state:
@@ -3634,22 +3634,22 @@ async def master_handler(client, message: Message):
             await async_update_data(DEFAULT_DATA.copy())
             add_admin_log("RESET_DATABASE", u_id, "Full database reset")
             await message.reply_text(
-                f"ðŸ’€ <b>DATABASE WIPED!</b>\n\n"
-                f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                f"â”‚ âœ… All data deleted.\n"
-                f"â”‚ ðŸ’¾ Backup: <code>{emergency_file}</code>\n"
-                f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+                f"💀 <b>DATABASE WIPED!</b>\n\n"
+                f"┌─────────────────────\n"
+                f"│ ✅ All data deleted.\n"
+                f"│ 💾 Backup: <code>{emergency_file}</code>\n"
+                f"└─────────────────────",
                 parse_mode=ParseMode.HTML
             )
         else:
             if u_id in user_state:
                 del user_state[u_id]
             await message.reply_text(
-                "âŒ <b>Reset Cancelled.</b> Text didn't match.",
+                "❌ <b>Reset Cancelled.</b> Text didn't match.",
                 parse_mode=ParseMode.HTML
             )
 
-    # â”€â”€ ADMIN: SEARCH USER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── ADMIN: SEARCH USER ────────────────────────
     elif step == "adm_search_user":
         if not is_admin(u_id):
             if u_id in user_state:
@@ -3671,13 +3671,13 @@ async def master_handler(client, message: Message):
 
         if not results:
             return await message.reply_text(
-                "ðŸ’€ <b>No users found.</b>",
+                "💀 <b>No users found.</b>",
                 parse_mode=ParseMode.HTML
             )
 
         result_text = (
-            f"ðŸ’€ <b>Search Results ({len(results)} found)</b>\n\n"
-            f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
+            f"💀 <b>Search Results ({len(results)} found)</b>\n\n"
+            f"┌─────────────────────\n"
         )
         for uid_str, u in results[:10]:
             uid_int = u.get("user_id", "?")
@@ -3685,17 +3685,17 @@ async def master_handler(client, message: Message):
             uname = f"@{u['username']}" if u.get("username") else "No @"
             plan = get_user_plan_name(uid_int) if isinstance(uid_int, int) else "?"
             is_banned = uid_int in data.get("banned_users", [])
-            tag = " ðŸš«" if is_banned else ""
+            tag = " 🚫" if is_banned else ""
             result_text += (
-                f"â”‚ <code>{uid_int}</code>{tag} â€” {sanitize_html(name)}\n"
-                f"â”‚ {uname} | {plan}\nâ”‚\n"
+                f"│ <code>{uid_int}</code>{tag} — {sanitize_html(name)}\n"
+                f"│ {uname} | {plan}\n│\n"
             )
         if len(results) > 10:
-            result_text += f"â”‚ ... +{len(results) - 10} more\n"
-        result_text += "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+            result_text += f"│ ... +{len(results) - 10} more\n"
+        result_text += "└─────────────────────"
         await message.reply_text(result_text, parse_mode=ParseMode.HTML)
 
-    # â”€â”€ ADMIN: ADD PREMIUM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── ADMIN: ADD PREMIUM ────────────────────────
     elif step == "adm_add_premium":
         if not is_admin(u_id):
             if u_id in user_state:
@@ -3707,7 +3707,7 @@ async def master_handler(client, message: Message):
         parts = text.split()
         if len(parts) < 2:
             return await message.reply_text(
-                "âŒ Format: <code>[user_id] [plan]</code>\n"
+                "❌ Format: <code>[user_id] [plan]</code>\n"
                 "Plans: basic | pro | elite",
                 parse_mode=ParseMode.HTML
             )
@@ -3716,7 +3716,7 @@ async def master_handler(client, message: Message):
             plan_key = parts[1].lower()
             if plan_key not in PLANS or plan_key == "free":
                 return await message.reply_text(
-                    "âŒ Invalid plan. Use: basic | pro | elite",
+                    "❌ Invalid plan. Use: basic | pro | elite",
                     parse_mode=ParseMode.HTML
                 )
             data = await async_get_data()
@@ -3729,32 +3729,32 @@ async def master_handler(client, message: Message):
             plan_info = PLANS[plan_key]
             add_admin_log(
                 "ADD_PREMIUM", u_id,
-                f"User {target_id} â†’ {plan_key}"
+                f"User {target_id} → {plan_key}"
             )
             await message.reply_text(
-                f"ðŸ’€ <b>Premium Added!</b>\n\n"
-                f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                f"â”‚ ðŸ†” {target_id} â†’ {plan_info['name']}\n"
-                f"â”‚ ðŸ‘¥ Slots: {plan_info['accounts']}\n"
-                f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+                f"💀 <b>Premium Added!</b>\n\n"
+                f"┌─────────────────────\n"
+                f"│ 🆔 {target_id} → {plan_info['name']}\n"
+                f"│ 👥 Slots: {plan_info['accounts']}\n"
+                f"└─────────────────────",
                 parse_mode=ParseMode.HTML
             )
             await safe_send(
                 target_id,
-                f"ðŸ’€ <b>Premium Activated!</b>\n\n"
-                f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                f"â”‚ ðŸŽ‰ Plan: {plan_info['name']}\n"
-                f"â”‚ ðŸ‘¥ Account Slots: {plan_info['accounts']}\n"
-                f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
+                f"💀 <b>Premium Activated!</b>\n\n"
+                f"┌─────────────────────\n"
+                f"│ 🎉 Plan: {plan_info['name']}\n"
+                f"│ 👥 Account Slots: {plan_info['accounts']}\n"
+                f"└─────────────────────\n\n"
                 f"@securedsitedns | @securedsitedns"
             )
         except ValueError:
             await message.reply_text(
-                "âŒ Invalid user ID.",
+                "❌ Invalid user ID.",
                 parse_mode=ParseMode.HTML
             )
 
-    # â”€â”€ ADMIN: REMOVE PREMIUM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── ADMIN: REMOVE PREMIUM ─────────────────────
     elif step == "adm_remove_premium":
         if not is_admin(u_id):
             if u_id in user_state:
@@ -3774,17 +3774,17 @@ async def master_handler(client, message: Message):
                     "REMOVE_PREMIUM", u_id, f"User {target_id}"
                 )
             await message.reply_text(
-                f"ðŸ’€ <b>{'Premium Removed' if removed else 'Not Found'}!</b>\n"
-                f"ðŸ†” ID: <code>{target_id}</code>",
+                f"💀 <b>{'Premium Removed' if removed else 'Not Found'}!</b>\n"
+                f"🆔 ID: <code>{target_id}</code>",
                 parse_mode=ParseMode.HTML
             )
         except ValueError:
             await message.reply_text(
-                "âŒ Invalid ID.",
+                "❌ Invalid ID.",
                 parse_mode=ParseMode.HTML
             )
 
-    # â”€â”€ ADMIN: SET GLOBAL FOOTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── ADMIN: SET GLOBAL FOOTER ──────────────────
     elif step == "adm_set_footer":
         if not is_admin(u_id):
             if u_id in user_state:
@@ -3798,19 +3798,19 @@ async def master_handler(client, message: Message):
             data["settings"]["global_ad_footer"] = ""
             await async_update_data(data)
             return await message.reply_text(
-                "âœ… Global footer cleared!",
+                "✅ Global footer cleared!",
                 parse_mode=ParseMode.HTML
             )
         data["settings"]["global_ad_footer"] = text
         await async_update_data(data)
         add_admin_log("SET_FOOTER", u_id, truncate_text(text, 50))
         await message.reply_text(
-            f"âœ… <b>Global footer set!</b>\n\n"
+            f"✅ <b>Global footer set!</b>\n\n"
             f"Preview: {truncate_text(text, 100)}",
             parse_mode=ParseMode.HTML
         )
 
-    # â”€â”€ ADMIN: SET FORCE JOIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── ADMIN: SET FORCE JOIN ─────────────────────
     elif step == "adm_set_forcejoin":
         if not is_admin(u_id):
             if u_id in user_state:
@@ -3824,7 +3824,7 @@ async def master_handler(client, message: Message):
             data["settings"]["force_join_channel"] = ""
             await async_update_data(data)
             return await message.reply_text(
-                "âœ… Force join disabled!",
+                "✅ Force join disabled!",
                 parse_mode=ParseMode.HTML
             )
         channel = text.strip()
@@ -3834,12 +3834,12 @@ async def master_handler(client, message: Message):
         await async_update_data(data)
         add_admin_log("SET_FORCEJOIN", u_id, channel)
         await message.reply_text(
-            f"âœ… <b>Force join set!</b>\n"
+            f"✅ <b>Force join set!</b>\n"
             f"Channel: <code>{channel}</code>",
             parse_mode=ParseMode.HTML
         )
 
-    # â”€â”€ ADMIN: BROADCAST MESSAGE TEXT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── ADMIN: BROADCAST MESSAGE TEXT ─────────────
     elif step == "adm_broadcast_text":
         if not is_admin(u_id):
             if u_id in user_state:
@@ -3851,7 +3851,7 @@ async def master_handler(client, message: Message):
         data = get_data()
         total = len(data["users"])
         msg = await message.reply_text(
-            f"ðŸ“¢ <b>Broadcasting to {total} users...</b>",
+            f"📢 <b>Broadcasting to {total} users...</b>",
             parse_mode=ParseMode.HTML
         )
         s, f_count = 0, 0
@@ -3886,15 +3886,15 @@ async def master_handler(client, message: Message):
             f"Sent: {s}, Failed: {f_count}"
         )
         await msg.edit_text(
-            f"ðŸ’€ <b>Broadcast Done!</b>\n\n"
-            f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            f"â”‚ âœ… Sent: <code>{s}</code>\n"
-            f"â”‚ âŒ Failed: <code>{f_count}</code>\n"
-            f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+            f"💀 <b>Broadcast Done!</b>\n\n"
+            f"┌─────────────────────\n"
+            f"│ ✅ Sent: <code>{s}</code>\n"
+            f"│ ❌ Failed: <code>{f_count}</code>\n"
+            f"└─────────────────────",
             parse_mode=ParseMode.HTML
         )
 
-    # â”€â”€ ADMIN: PREMIUM BROADCAST TEXT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── ADMIN: PREMIUM BROADCAST TEXT ─────────────
     elif step == "adm_broadcast_premium_text":
         if not is_admin(u_id):
             if u_id in user_state:
@@ -3908,12 +3908,12 @@ async def master_handler(client, message: Message):
 
         if not premium_ids:
             return await message.reply_text(
-                "âŒ No premium users to broadcast to!",
+                "❌ No premium users to broadcast to!",
                 parse_mode=ParseMode.HTML
             )
 
         msg = await message.reply_text(
-            f"ðŸ“¢ <b>Premium Broadcast...</b>\n"
+            f"📢 <b>Premium Broadcast...</b>\n"
             f"Target: <code>{len(premium_ids)}</code> premium users",
             parse_mode=ParseMode.HTML
         )
@@ -3951,17 +3951,17 @@ async def master_handler(client, message: Message):
         )
 
         await msg.edit_text(
-            f"ðŸ’€ <b>Premium Broadcast Done!</b>\n\n"
-            f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            f"â”‚ âœ… Sent: <code>{s}</code>\n"
-            f"â”‚ âŒ Failed: <code>{f_count}</code>\n"
-            f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+            f"💀 <b>Premium Broadcast Done!</b>\n\n"
+            f"┌─────────────────────\n"
+            f"│ ✅ Sent: <code>{s}</code>\n"
+            f"│ ❌ Failed: <code>{f_count}</code>\n"
+            f"└─────────────────────",
             parse_mode=ParseMode.HTML
         )
 
 
 # =====================================================
-# ðŸ“Š SYSTEM STATS HELPER
+# 📊 SYSTEM STATS HELPER
 # =====================================================
 def get_system_stats() -> dict:
     """Get comprehensive system statistics."""
@@ -4049,13 +4049,13 @@ def get_system_stats() -> dict:
         "admin_log_count": len(data.get("admin_logs", []))
     }
 # =====================================================
-# ðŸ‘‘ ADMIN PANEL â€” MAIN COMMAND
+# 👑 ADMIN PANEL — MAIN COMMAND
 # =====================================================
 @bot.on_message(filters.command("panel") & filters.private)
 async def admin_panel_cmd(client, message: Message):
     if not is_admin(message.from_user.id):
         return await message.reply_text(
-            "ðŸ’€ <b>Access Denied!</b>\nðŸš« Admin only command.",
+            "💀 <b>Access Denied!</b>\n🚫 Admin only command.",
             parse_mode=ParseMode.HTML
         )
     await send_admin_panel(message, is_edit=False)
@@ -4064,91 +4064,91 @@ async def admin_panel_cmd(client, message: Message):
 async def send_admin_panel(msg_or_query, is_edit: bool = False):
     """Send the full admin panel."""
     s = get_system_stats()
-    m_mode = "ðŸ”´ ON" if s["m_mode"] else "ðŸŸ¢ OFF"
+    m_mode = "🔴 ON" if s["m_mode"] else "🟢 OFF"
     success_rate = 0
     total_ops = s["total_sent"] + s["total_failed"]
     if total_ops > 0:
         success_rate = round((s["total_sent"] / total_ops) * 100, 1)
 
-    fj = f"âœ… {s['force_join']}" if s["force_join"] else "âŒ Disabled"
-    gf = "âœ… Set" if s["global_footer"] else "âŒ None"
+    fj = f"✅ {s['force_join']}" if s["force_join"] else "❌ Disabled"
+    gf = "✅ Set" if s["global_footer"] else "❌ None"
 
     text = (
-        f"ðŸ’€ <b>Skull Ads â€” Admin Control Center</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ‘‘ <b>SYSTEM OVERVIEW</b>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ‘¥ Total Users: <code>{s['total_users']}</code>\n"
-        f"â”‚ ðŸŸ¢ Active (24h): <code>{s['active_24h']}</code>\n"
-        f"â”‚ ðŸ’Ž Premium: <code>{s['premium_count']}</code>\n"
-        f"â”‚ ðŸš« Banned: <code>{s['banned']}</code>\n"
-        f"â”‚ ðŸ”‘ Sessions: <code>{s['total_accounts']}</code>\n"
-        f"â”‚ ðŸ”— Referrals: <code>{s['total_referrals']}</code>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ“Š <b>PLAN DISTRIBUTION</b>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ†“ Free: <code>{s['plan_dist']['free']}</code> | "
-        f"âš¡ Basic: <code>{s['plan_dist']['basic']}</code>\n"
-        f"â”‚ ðŸ’Ž Pro: <code>{s['plan_dist']['pro']}</code> | "
-        f"ðŸ‘‘ Elite: <code>{s['plan_dist']['elite']}</code>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸš€ <b>CAMPAIGN ENGINE</b>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸŸ¢ Running: <code>{s['running']}</code> | "
-        f"ðŸ”´ Paused: <code>{s['paused']}</code>\n"
-        f"â”‚ âœ… Done: <code>{s['completed']}</code> | "
-        f"âšª Idle: <code>{s['idle_camps']}</code>\n"
-        f"â”‚ âš¡ Tasks: <code>{s['active_engine_tasks']}</code> | "
-        f"ðŸŽ¯ Targets: <code>{s['total_targets']}</code>\n"
-        f"â”‚ ðŸ“ With Ad: <code>{s['total_with_ad']}</code> | "
-        f"âš™ï¸ Config: <code>{s['total_configured']}</code>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ“ˆ <b>LIFETIME STATS</b>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸš€ Sent: <code>{s['total_sent']:,}</code> | "
-        f"âŒ Failed: <code>{s['total_failed']:,}</code>\n"
-        f"â”‚ ðŸ“ˆ Success: <code>{success_rate}%</code>\n"
-        f"â”‚ ðŸ“² Logins: <code>{s['logins']}</code> | "
-        f"ðŸ“¤ Logouts: <code>{s['logouts']}</code>\n"
-        f"â”‚ ðŸ“¢ Broadcasts: <code>{s['total_broadcasts']}</code> | "
-        f"ðŸ”„ Starts: <code>{s['bot_starts']}</code>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ–¥ï¸ <b>SERVER & CONFIG</b>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ›  Maintenance: {m_mode}\n"
-        f"â”‚ â±ï¸ Uptime: <code>{s['uptime']}</code>\n"
-        f"â”‚ ðŸ’¾ DB Size: <code>{s['file_size_str']}</code>\n"
-        f"â”‚ ðŸ“¢ Force Join: {fj}\n"
-        f"â”‚ ðŸ“ Footer: {gf}\n"
-        f"â”‚ ðŸ“‹ Logs: <code>{s['admin_log_count']}</code> entries\n"
-        f"â”‚ ðŸ¤– Version: <code>v{BOT_VERSION}</code>\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        f"💀 <b>Skull Ads — Admin Control Center</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ 👑 <b>SYSTEM OVERVIEW</b>\n"
+        f"├─────────────────────\n"
+        f"│ 👥 Total Users: <code>{s['total_users']}</code>\n"
+        f"│ 🟢 Active (24h): <code>{s['active_24h']}</code>\n"
+        f"│ 💎 Premium: <code>{s['premium_count']}</code>\n"
+        f"│ 🚫 Banned: <code>{s['banned']}</code>\n"
+        f"│ 🔑 Sessions: <code>{s['total_accounts']}</code>\n"
+        f"│ 🔗 Referrals: <code>{s['total_referrals']}</code>\n"
+        f"├─────────────────────\n"
+        f"│ 📊 <b>PLAN DISTRIBUTION</b>\n"
+        f"├─────────────────────\n"
+        f"│ 🆓 Free: <code>{s['plan_dist']['free']}</code> | "
+        f"⚡ Basic: <code>{s['plan_dist']['basic']}</code>\n"
+        f"│ 💎 Pro: <code>{s['plan_dist']['pro']}</code> | "
+        f"👑 Elite: <code>{s['plan_dist']['elite']}</code>\n"
+        f"├─────────────────────\n"
+        f"│ 🚀 <b>CAMPAIGN ENGINE</b>\n"
+        f"├─────────────────────\n"
+        f"│ 🟢 Running: <code>{s['running']}</code> | "
+        f"🔴 Paused: <code>{s['paused']}</code>\n"
+        f"│ ✅ Done: <code>{s['completed']}</code> | "
+        f"⚪ Idle: <code>{s['idle_camps']}</code>\n"
+        f"│ ⚡ Tasks: <code>{s['active_engine_tasks']}</code> | "
+        f"🎯 Targets: <code>{s['total_targets']}</code>\n"
+        f"│ 📝 With Ad: <code>{s['total_with_ad']}</code> | "
+        f"⚙️ Config: <code>{s['total_configured']}</code>\n"
+        f"├─────────────────────\n"
+        f"│ 📈 <b>LIFETIME STATS</b>\n"
+        f"├─────────────────────\n"
+        f"│ 🚀 Sent: <code>{s['total_sent']:,}</code> | "
+        f"❌ Failed: <code>{s['total_failed']:,}</code>\n"
+        f"│ 📈 Success: <code>{success_rate}%</code>\n"
+        f"│ 📲 Logins: <code>{s['logins']}</code> | "
+        f"📤 Logouts: <code>{s['logouts']}</code>\n"
+        f"│ 📢 Broadcasts: <code>{s['total_broadcasts']}</code> | "
+        f"🔄 Starts: <code>{s['bot_starts']}</code>\n"
+        f"├─────────────────────\n"
+        f"│ 🖥️ <b>SERVER & CONFIG</b>\n"
+        f"├─────────────────────\n"
+        f"│ 🛠 Maintenance: {m_mode}\n"
+        f"│ ⏱️ Uptime: <code>{s['uptime']}</code>\n"
+        f"│ 💾 DB Size: <code>{s['file_size_str']}</code>\n"
+        f"│ 📢 Force Join: {fj}\n"
+        f"│ 📝 Footer: {gf}\n"
+        f"│ 📋 Logs: <code>{s['admin_log_count']}</code> entries\n"
+        f"│ 🤖 Version: <code>v{BOT_VERSION}</code>\n"
+        f"└─────────────────────"
     )
 
     markup = InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("ðŸ‘¥ Users", callback_data="adm_users"),
-            InlineKeyboardButton("ðŸ’Ž Premium", callback_data="adm_premium")
+            InlineKeyboardButton("👥 Users", callback_data="adm_users"),
+            InlineKeyboardButton("💎 Premium", callback_data="adm_premium")
         ],
         [
-            InlineKeyboardButton("ðŸš€ Campaigns", callback_data="adm_campaigns"),
-            InlineKeyboardButton("ðŸ”‘ Sessions", callback_data="adm_sessions")
+            InlineKeyboardButton("🚀 Campaigns", callback_data="adm_campaigns"),
+            InlineKeyboardButton("🔑 Sessions", callback_data="adm_sessions")
         ],
         [
-            InlineKeyboardButton("ðŸ“¢ Broadcast", callback_data="adm_broadcast_menu"),
-            InlineKeyboardButton("ðŸ’¾ Database", callback_data="adm_db_menu")
+            InlineKeyboardButton("📢 Broadcast", callback_data="adm_broadcast_menu"),
+            InlineKeyboardButton("💾 Database", callback_data="adm_db_menu")
         ],
         [
-            InlineKeyboardButton("âš™ï¸ Settings", callback_data="adm_settings"),
-            InlineKeyboardButton("ðŸ“Š Analytics", callback_data="adm_analytics")
+            InlineKeyboardButton("⚙️ Settings", callback_data="adm_settings"),
+            InlineKeyboardButton("📊 Analytics", callback_data="adm_analytics")
         ],
         [
-            InlineKeyboardButton("ðŸ“‹ Logs", callback_data="adm_logs"),
-            InlineKeyboardButton("ðŸš« Banned", callback_data="adm_banned_list")
+            InlineKeyboardButton("📋 Logs", callback_data="adm_logs"),
+            InlineKeyboardButton("🚫 Banned", callback_data="adm_banned_list")
         ],
         [
-            InlineKeyboardButton("ðŸ” Search User", callback_data="adm_search"),
-            InlineKeyboardButton("ðŸ”„ Refresh", callback_data="adm_refresh_panel")
+            InlineKeyboardButton("🔍 Search User", callback_data="adm_search"),
+            InlineKeyboardButton("🔄 Refresh", callback_data="adm_refresh_panel")
         ]
     ])
 
@@ -4164,36 +4164,36 @@ async def send_admin_panel(msg_or_query, is_edit: bool = False):
 
 
 # =====================================================
-# ðŸ‘‘ ADMIN PANEL â€” CALLBACK HANDLERS
+# 👑 ADMIN PANEL — CALLBACK HANDLERS
 # =====================================================
 
-# â”€â”€ Refresh Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Refresh Panel ─────────────────────────────────────
 @bot.on_callback_query(filters.regex("^adm_refresh_panel$"))
 async def adm_refresh_panel_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     if is_rate_limited(query.from_user.id, "adm_refresh", 2):
-        return await query.answer("â³ Wait...", show_alert=False)
+        return await query.answer("⏳ Wait...", show_alert=False)
     await send_admin_panel(query.message, is_edit=True)
-    await query.answer("âœ… Refreshed!", show_alert=False)
+    await query.answer("✅ Refreshed!", show_alert=False)
 
 
-# â”€â”€ Back to Admin Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Back to Admin Panel ──────────────────────────────
 @bot.on_callback_query(filters.regex("^adm_back_panel$"))
 async def adm_back_panel_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     # Clear any admin state
     if query.from_user.id in user_state:
         del user_state[query.from_user.id]
     await send_admin_panel(query.message, is_edit=True)
 
 
-# â”€â”€ Users Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Users Section ────────────────────────────────────
 @bot.on_callback_query(filters.regex("^adm_users$"))
 async def adm_users_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
 
     data = get_data()
     users = list(data.get("users", {}).values())
@@ -4206,14 +4206,14 @@ async def adm_users_cb(client, query: CallbackQuery):
     )
 
     text = (
-        f"ðŸ’€ <b>Admin â€” User Management</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ‘¥ <b>Total:</b> <code>{total}</code>\n"
-        f"â”‚ ðŸ’Ž <b>Premium:</b> <code>{premium_count}</code>\n"
-        f"â”‚ ðŸš« <b>Banned:</b> <code>{banned_count}</code>\n"
-        f"â”‚ ðŸ†“ <b>Free:</b> <code>{total - premium_count}</code>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ <b>ðŸ“‹ Recent Users:</b>\n"
+        f"💀 <b>Admin — User Management</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ 👥 <b>Total:</b> <code>{total}</code>\n"
+        f"│ 💎 <b>Premium:</b> <code>{premium_count}</code>\n"
+        f"│ 🚫 <b>Banned:</b> <code>{banned_count}</code>\n"
+        f"│ 🆓 <b>Free:</b> <code>{total - premium_count}</code>\n"
+        f"├─────────────────────\n"
+        f"│ <b>📋 Recent Users:</b>\n"
     )
 
     for u in sorted_users[:8]:
@@ -4223,40 +4223,40 @@ async def adm_users_cb(client, query: CallbackQuery):
         is_premium = str(uid) in data.get("premium_users", {})
         tag = ""
         if is_banned:
-            tag = " ðŸš«"
+            tag = " 🚫"
         elif is_premium:
-            tag = " ðŸ’Ž"
+            tag = " 💎"
         joined = u.get("joined_date", "N/A")[:10]
-        text += f"â”‚ <code>{uid}</code>{tag} â€¢ {name} â€¢ {joined}\n"
+        text += f"│ <code>{uid}</code>{tag} • {name} • {joined}\n"
 
     if total > 8:
-        text += f"â”‚ ... +{total - 8} more\n"
-    text += "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        text += f"│ ... +{total - 8} more\n"
+    text += "└─────────────────────"
 
     markup = InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("ðŸ“‹ List All", callback_data="adm_list_users_0"),
-            InlineKeyboardButton("ðŸ” Search", callback_data="adm_search")
+            InlineKeyboardButton("📋 List All", callback_data="adm_list_users_0"),
+            InlineKeyboardButton("🔍 Search", callback_data="adm_search")
         ],
         [
-            InlineKeyboardButton("ðŸ’Ž Premium Users", callback_data="adm_premium"),
-            InlineKeyboardButton("ðŸš« Banned Users", callback_data="adm_banned_list")
+            InlineKeyboardButton("💎 Premium Users", callback_data="adm_premium"),
+            InlineKeyboardButton("🚫 Banned Users", callback_data="adm_banned_list")
         ],
         [
-            InlineKeyboardButton("ðŸ“Š User Stats", callback_data="adm_user_stats"),
-            InlineKeyboardButton("ðŸ“¤ Export Users", callback_data="adm_export_users")
+            InlineKeyboardButton("📊 User Stats", callback_data="adm_user_stats"),
+            InlineKeyboardButton("📤 Export Users", callback_data="adm_export_users")
         ],
-        [InlineKeyboardButton("ðŸ”™ Admin Panel", callback_data="adm_back_panel")]
+        [InlineKeyboardButton("🔙 Admin Panel", callback_data="adm_back_panel")]
     ])
 
     await safe_edit(query.message, text, markup)
 
 
-# â”€â”€ List Users Paginated â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── List Users Paginated ─────────────────────────────
 @bot.on_callback_query(filters.regex(r"^adm_list_users_(\d+)$"))
 async def adm_list_users_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
 
     page = int(query.matches[0].group(1))
     data = get_data()
@@ -4269,38 +4269,38 @@ async def adm_list_users_cb(client, query: CallbackQuery):
     start = page * per_page
     end = start + per_page
 
-    text = f"ðŸ’€ <b>All Users â€” Page {page + 1}/{total_pages}</b>\n\nâ”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
+    text = f"💀 <b>All Users — Page {page + 1}/{total_pages}</b>\n\n┌─────────────────────\n"
 
     for u in users[start:end]:
         uid = u.get("user_id", "?")
         name = truncate_text(sanitize_html(u.get("name", "N/A")), 10)
         is_banned = uid in data.get("banned_users", [])
         is_premium = str(uid) in data.get("premium_users", {})
-        tag = " ðŸš«" if is_banned else (" ðŸ’Ž" if is_premium else "")
-        text += f"â”‚ <code>{uid}</code>{tag} â€¢ {name}\n"
+        tag = " 🚫" if is_banned else (" 💎" if is_premium else "")
+        text += f"│ <code>{uid}</code>{tag} • {name}\n"
 
-    text += "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+    text += "└─────────────────────"
 
     nav = []
     if page > 0:
-        nav.append(InlineKeyboardButton("â—€ï¸", callback_data=f"adm_list_users_{page - 1}"))
+        nav.append(InlineKeyboardButton("◀️", callback_data=f"adm_list_users_{page - 1}"))
     nav.append(InlineKeyboardButton(f"{page + 1}/{total_pages}", callback_data="noop"))
     if page < total_pages - 1:
-        nav.append(InlineKeyboardButton("â–¶ï¸", callback_data=f"adm_list_users_{page + 1}"))
+        nav.append(InlineKeyboardButton("▶️", callback_data=f"adm_list_users_{page + 1}"))
 
     markup = InlineKeyboardMarkup([
         nav,
-        [InlineKeyboardButton("ðŸ”™ Back", callback_data="adm_users")]
+        [InlineKeyboardButton("🔙 Back", callback_data="adm_users")]
     ])
 
     await safe_edit(query.message, text, markup)
 
 
-# â”€â”€ User Stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── User Stats ────────────────────────────────────────
 @bot.on_callback_query(filters.regex("^adm_user_stats$"))
 async def adm_user_stats_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
 
     data = get_data()
     stats = data.get("stats", {})
@@ -4311,30 +4311,30 @@ async def adm_user_stats_cb(client, query: CallbackQuery):
         reverse=True
     )[:10]
 
-    text = "ðŸ’€ <b>Top Senders</b>\n\nâ”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
+    text = "💀 <b>Top Senders</b>\n\n┌─────────────────────\n"
     for i, (uid_str, st) in enumerate(top_senders, 1):
         user = data["users"].get(uid_str, {})
         name = truncate_text(sanitize_html(user.get("name", "Unknown")), 12)
         sent = st.get("total_sent", 0)
-        text += f"â”‚ {i}. <code>{uid_str}</code> â€¢ {name} â€¢ <code>{sent:,}</code> sent\n"
+        text += f"│ {i}. <code>{uid_str}</code> • {name} • <code>{sent:,}</code> sent\n"
 
     if not top_senders:
-        text += "â”‚ No data yet.\n"
-    text += "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        text += "│ No data yet.\n"
+    text += "└─────────────────────"
 
     await safe_edit(
         query.message, text,
         InlineKeyboardMarkup([
-            [InlineKeyboardButton("ðŸ”™ Back", callback_data="adm_users")]
+            [InlineKeyboardButton("🔙 Back", callback_data="adm_users")]
         ])
     )
 
 
-# â”€â”€ Export Users â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Export Users ──────────────────────────────────────
 @bot.on_callback_query(filters.regex("^adm_export_users$"))
 async def adm_export_users_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
 
     data = get_data()
     lines = ["USER_ID,NAME,USERNAME,JOINED,PLAN,BANNED"]
@@ -4353,7 +4353,7 @@ async def adm_export_users_cb(client, query: CallbackQuery):
             f.write("\n".join(lines))
         await query.message.reply_document(
             document=export_file,
-            caption=f"ðŸ’€ <b>User Export</b>\n{len(lines) - 1} users",
+            caption=f"💀 <b>User Export</b>\n{len(lines) - 1} users",
             parse_mode=ParseMode.HTML
         )
     except Exception as e:
@@ -4367,19 +4367,19 @@ async def adm_export_users_cb(client, query: CallbackQuery):
                 pass
 
 
-# â”€â”€ Premium Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Premium Section ───────────────────────────────────
 @bot.on_callback_query(filters.regex("^adm_premium$"))
 async def adm_premium_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
 
     data = get_data()
     premium = data.get("premium_users", {})
 
-    text = f"ðŸ’€ <b>Admin â€” Premium Users ({len(premium)})</b>\n\nâ”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
+    text = f"💀 <b>Admin — Premium Users ({len(premium)})</b>\n\n┌─────────────────────\n"
 
     if not premium:
-        text += "â”‚ No premium users yet.\n"
+        text += "│ No premium users yet.\n"
     else:
         for uid_str, info in list(premium.items())[:15]:
             plan_key = info.get("plan", "?")
@@ -4387,18 +4387,18 @@ async def adm_premium_cb(client, query: CallbackQuery):
             added = info.get("added_date", "N/A")[:10]
             user = data["users"].get(uid_str, {})
             name = truncate_text(sanitize_html(user.get("name", "N/A")), 12)
-            text += f"â”‚ <code>{uid_str}</code> â€¢ {name} â€¢ {plan_name} â€¢ {added}\n"
+            text += f"│ <code>{uid_str}</code> • {name} • {plan_name} • {added}\n"
         if len(premium) > 15:
-            text += f"â”‚ ... +{len(premium) - 15} more\n"
+            text += f"│ ... +{len(premium) - 15} more\n"
 
-    text += "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+    text += "└─────────────────────"
 
     markup = InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("âž• Add Premium", callback_data="adm_add_premium_btn"),
-            InlineKeyboardButton("âž– Remove", callback_data="adm_remove_premium_btn")
+            InlineKeyboardButton("➕ Add Premium", callback_data="adm_add_premium_btn"),
+            InlineKeyboardButton("➖ Remove", callback_data="adm_remove_premium_btn")
         ],
-        [InlineKeyboardButton("ðŸ”™ Admin Panel", callback_data="adm_back_panel")]
+        [InlineKeyboardButton("🔙 Admin Panel", callback_data="adm_back_panel")]
     ])
 
     await safe_edit(query.message, text, markup)
@@ -4407,16 +4407,16 @@ async def adm_premium_cb(client, query: CallbackQuery):
 @bot.on_callback_query(filters.regex("^adm_add_premium_btn$"))
 async def adm_add_premium_btn_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     user_state[query.from_user.id] = {"step": "adm_add_premium", "_created": time.time()}
     await safe_edit(
         query.message,
-        "ðŸ’€ <b>Add Premium</b>\n\n"
+        "💀 <b>Add Premium</b>\n\n"
         "Send: <code>[user_id] [plan]</code>\n\n"
         "Plans: <code>basic</code> | <code>pro</code> | <code>elite</code>\n\n"
         "Example: <code>123456789 pro</code>",
         InlineKeyboardMarkup([
-            [InlineKeyboardButton("âŒ Cancel", callback_data="adm_premium")]
+            [InlineKeyboardButton("❌ Cancel", callback_data="adm_premium")]
         ])
     )
 
@@ -4424,24 +4424,24 @@ async def adm_add_premium_btn_cb(client, query: CallbackQuery):
 @bot.on_callback_query(filters.regex("^adm_remove_premium_btn$"))
 async def adm_remove_premium_btn_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     user_state[query.from_user.id] = {"step": "adm_remove_premium", "_created": time.time()}
     await safe_edit(
         query.message,
-        "ðŸ’€ <b>Remove Premium</b>\n\n"
+        "💀 <b>Remove Premium</b>\n\n"
         "Send the user ID to remove premium from:\n\n"
         "Example: <code>123456789</code>",
         InlineKeyboardMarkup([
-            [InlineKeyboardButton("âŒ Cancel", callback_data="adm_premium")]
+            [InlineKeyboardButton("❌ Cancel", callback_data="adm_premium")]
         ])
     )
 
 
-# â”€â”€ Campaigns Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Campaigns Section ─────────────────────────────────
 @bot.on_callback_query(filters.regex("^adm_campaigns$"))
 async def adm_campaigns_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
 
     data = get_data()
     campaigns = data.get("campaigns", {})
@@ -4456,43 +4456,43 @@ async def adm_campaigns_cb(client, query: CallbackQuery):
         c_round = camp.get("current_round", 0)
         t_round = camp.get("total_rounds", 0)
 
-        entry = f"<code>{uid_str}</code> â€¢ {name} â€¢ ðŸŽ¯{targets} â€¢ R{c_round}/{t_round}"
+        entry = f"<code>{uid_str}</code> • {name} • 🎯{targets} • R{c_round}/{t_round}"
 
         if status == "RUNNING":
             running_list.append(entry)
         elif status == "PAUSED":
             paused_list.append(entry)
 
-    text = "ðŸ’€ <b>Admin â€” Campaign Manager</b>\n\n"
+    text = "💀 <b>Admin — Campaign Manager</b>\n\n"
 
-    text += f"<b>ðŸŸ¢ Running ({len(running_list)}):</b>\nâ”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
+    text += f"<b>🟢 Running ({len(running_list)}):</b>\n┌─────────────────────\n"
     for r in running_list[:8]:
-        text += f"â”‚ {r}\n"
+        text += f"│ {r}\n"
     if not running_list:
-        text += "â”‚ None\n"
+        text += "│ None\n"
     if len(running_list) > 8:
-        text += f"â”‚ ... +{len(running_list) - 8} more\n"
-    text += "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
+        text += f"│ ... +{len(running_list) - 8} more\n"
+    text += "└─────────────────────\n\n"
 
-    text += f"<b>ðŸ”´ Paused ({len(paused_list)}):</b>\nâ”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
+    text += f"<b>🔴 Paused ({len(paused_list)}):</b>\n┌─────────────────────\n"
     for p in paused_list[:5]:
-        text += f"â”‚ {p}\n"
+        text += f"│ {p}\n"
     if not paused_list:
-        text += "â”‚ None\n"
+        text += "│ None\n"
     if len(paused_list) > 5:
-        text += f"â”‚ ... +{len(paused_list) - 5} more\n"
-    text += "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        text += f"│ ... +{len(paused_list) - 5} more\n"
+    text += "└─────────────────────"
 
     markup = InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("â¸ï¸ Pause All", callback_data="adm_pauseall_btn"),
-            InlineKeyboardButton("â–¶ï¸ Resume All", callback_data="adm_resumeall_btn")
+            InlineKeyboardButton("⏸️ Pause All", callback_data="adm_pauseall_btn"),
+            InlineKeyboardButton("▶️ Resume All", callback_data="adm_resumeall_btn")
         ],
         [
-            InlineKeyboardButton("ðŸ—‘ï¸ Clear Done", callback_data="adm_clear_completed"),
-            InlineKeyboardButton("ðŸ”„ Reset All", callback_data="adm_reset_all_camps")
+            InlineKeyboardButton("🗑️ Clear Done", callback_data="adm_clear_completed"),
+            InlineKeyboardButton("🔄 Reset All", callback_data="adm_reset_all_camps")
         ],
-        [InlineKeyboardButton("ðŸ”™ Admin Panel", callback_data="adm_back_panel")]
+        [InlineKeyboardButton("🔙 Admin Panel", callback_data="adm_back_panel")]
     ])
 
     await safe_edit(query.message, text, markup)
@@ -4501,7 +4501,7 @@ async def adm_campaigns_cb(client, query: CallbackQuery):
 @bot.on_callback_query(filters.regex("^adm_pauseall_btn$"))
 async def adm_pauseall_btn_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     data = await async_get_data()
     count = 0
     for uid in data["campaigns"]:
@@ -4510,14 +4510,14 @@ async def adm_pauseall_btn_cb(client, query: CallbackQuery):
             count += 1
     await async_update_data(data)
     add_admin_log("PAUSE_ALL", query.from_user.id, f"{count} campaigns paused")
-    await query.answer(f"â¸ï¸ {count} campaigns paused!", show_alert=True)
+    await query.answer(f"⏸️ {count} campaigns paused!", show_alert=True)
     await adm_campaigns_cb(client, query)
 
 
 @bot.on_callback_query(filters.regex("^adm_resumeall_btn$"))
 async def adm_resumeall_btn_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     data = await async_get_data()
     count = 0
     for uid in data["campaigns"]:
@@ -4529,14 +4529,14 @@ async def adm_resumeall_btn_cb(client, query: CallbackQuery):
             count += 1
     await async_update_data(data)
     add_admin_log("RESUME_ALL", query.from_user.id, f"{count} campaigns resumed")
-    await query.answer(f"â–¶ï¸ {count} campaigns resumed!", show_alert=True)
+    await query.answer(f"▶️ {count} campaigns resumed!", show_alert=True)
     await adm_campaigns_cb(client, query)
 
 
 @bot.on_callback_query(filters.regex("^adm_clear_completed$"))
 async def adm_clear_completed_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     data = await async_get_data()
     count = 0
     for uid in list(data["campaigns"].keys()):
@@ -4545,14 +4545,14 @@ async def adm_clear_completed_cb(client, query: CallbackQuery):
             data["campaigns"][uid]["current_round"] = 1
             count += 1
     await async_update_data(data)
-    await query.answer(f"ðŸ—‘ï¸ {count} completed campaigns cleared!", show_alert=True)
+    await query.answer(f"🗑️ {count} completed campaigns cleared!", show_alert=True)
     await adm_campaigns_cb(client, query)
 
 
 @bot.on_callback_query(filters.regex("^adm_reset_all_camps$"))
 async def adm_reset_all_camps_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     data = await async_get_data()
     count = 0
     for uid in data["campaigns"]:
@@ -4561,23 +4561,23 @@ async def adm_reset_all_camps_cb(client, query: CallbackQuery):
         count += 1
     await async_update_data(data)
     add_admin_log("RESET_ALL_CAMPAIGNS", query.from_user.id, f"{count} reset")
-    await query.answer(f"ðŸ”„ {count} campaigns reset!", show_alert=True)
+    await query.answer(f"🔄 {count} campaigns reset!", show_alert=True)
     await adm_campaigns_cb(client, query)
 
 
-# â”€â”€ Sessions Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Sessions Section ──────────────────────────────────
 @bot.on_callback_query(filters.regex("^adm_sessions$"))
 async def adm_sessions_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
 
     data = get_data()
     accounts = data.get("accounts", {})
 
-    text = f"ðŸ’€ <b>Admin â€” Session Manager ({len(accounts)})</b>\n\nâ”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
+    text = f"💀 <b>Admin — Session Manager ({len(accounts)})</b>\n\n┌─────────────────────\n"
 
     if not accounts:
-        text += "â”‚ No active sessions.\n"
+        text += "│ No active sessions.\n"
     else:
         for acc_key, acc in list(accounts.items())[:12]:
             uid = acc.get("user_id", "?")
@@ -4585,18 +4585,18 @@ async def adm_sessions_cb(client, query: CallbackQuery):
             added = acc.get("added_date", "N/A")[:10]
             user = data["users"].get(str(uid), {})
             name = truncate_text(sanitize_html(user.get("name", "?")), 8)
-            text += f"â”‚ {phone} â€¢ {name} (<code>{uid}</code>) â€¢ {added}\n"
+            text += f"│ {phone} • {name} (<code>{uid}</code>) • {added}\n"
         if len(accounts) > 12:
-            text += f"â”‚ ... +{len(accounts) - 12} more\n"
+            text += f"│ ... +{len(accounts) - 12} more\n"
 
-    text += "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+    text += "└─────────────────────"
 
     markup = InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("ðŸ”„ Validate All", callback_data="adm_validate_sessions"),
-            InlineKeyboardButton("ðŸ—‘ï¸ Clear Invalid", callback_data="adm_clear_invalid")
+            InlineKeyboardButton("🔄 Validate All", callback_data="adm_validate_sessions"),
+            InlineKeyboardButton("🗑️ Clear Invalid", callback_data="adm_clear_invalid")
         ],
-        [InlineKeyboardButton("ðŸ”™ Admin Panel", callback_data="adm_back_panel")]
+        [InlineKeyboardButton("🔙 Admin Panel", callback_data="adm_back_panel")]
     ])
 
     await safe_edit(query.message, text, markup)
@@ -4605,9 +4605,9 @@ async def adm_sessions_cb(client, query: CallbackQuery):
 @bot.on_callback_query(filters.regex("^adm_validate_sessions$"))
 async def adm_validate_sessions_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
 
-    await query.answer("â³ Validating sessions... This may take a while.", show_alert=True)
+    await query.answer("⏳ Validating sessions... This may take a while.", show_alert=True)
 
     data = get_data()
     accounts = data.get("accounts", {})
@@ -4649,24 +4649,24 @@ async def adm_validate_sessions_cb(client, query: CallbackQuery):
 
     await safe_send(
         query.from_user.id,
-        f"ðŸ’€ <b>Session Validation Complete!</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ âœ… Valid: <code>{valid}</code>\n"
-        f"â”‚ âŒ Invalid: <code>{invalid}</code>\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        f"💀 <b>Session Validation Complete!</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ ✅ Valid: <code>{valid}</code>\n"
+        f"│ ❌ Invalid: <code>{invalid}</code>\n"
+        f"└─────────────────────"
     )
 
 
 @bot.on_callback_query(filters.regex("^adm_clear_invalid$"))
 async def adm_clear_invalid_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
 
     data = await async_get_data()
     invalid_keys = data.get("settings", {}).get("_invalid_sessions", [])
 
     if not invalid_keys:
-        return await query.answer("â„¹ï¸ Run 'Validate All' first!", show_alert=True)
+        return await query.answer("ℹ️ Run 'Validate All' first!", show_alert=True)
 
     count = 0
     for key in invalid_keys:
@@ -4692,15 +4692,15 @@ async def adm_clear_invalid_cb(client, query: CallbackQuery):
     data["settings"].pop("_invalid_sessions", None)
     await async_update_data(data)
     add_admin_log("CLEAR_INVALID_SESSIONS", query.from_user.id, f"{count} removed")
-    await query.answer(f"ðŸ—‘ï¸ {count} invalid sessions removed!", show_alert=True)
+    await query.answer(f"🗑️ {count} invalid sessions removed!", show_alert=True)
     await adm_sessions_cb(client, query)
 
 
-# â”€â”€ Broadcast Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Broadcast Section ─────────────────────────────────
 @bot.on_callback_query(filters.regex("^adm_broadcast_menu$"))
 async def adm_broadcast_menu_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
 
     data = get_data()
     total_users = len(data["users"])
@@ -4708,24 +4708,24 @@ async def adm_broadcast_menu_cb(client, query: CallbackQuery):
     total_bc = data["settings"].get("total_broadcasts", 0)
 
     text = (
-        f"ðŸ’€ <b>Admin â€” Broadcast Center</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ‘¥ Total Users: <code>{total_users}</code>\n"
-        f"â”‚ ðŸ’Ž Premium Users: <code>{premium_count}</code>\n"
-        f"â”‚ ðŸ“¢ Total Broadcasts: <code>{total_bc}</code>\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
+        f"💀 <b>Admin — Broadcast Center</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ 👥 Total Users: <code>{total_users}</code>\n"
+        f"│ 💎 Premium Users: <code>{premium_count}</code>\n"
+        f"│ 📢 Total Broadcasts: <code>{total_bc}</code>\n"
+        f"└─────────────────────\n\n"
         f"<b>Methods:</b>\n"
-        f"â€¢ <b>Reply Broadcast:</b> Reply to a msg with /broadcast\n"
-        f"â€¢ <b>Text Broadcast:</b> Type message below\n"
-        f"â€¢ <b>Premium Only:</b> Send to premium users only"
+        f"• <b>Reply Broadcast:</b> Reply to a msg with /broadcast\n"
+        f"• <b>Text Broadcast:</b> Type message below\n"
+        f"• <b>Premium Only:</b> Send to premium users only"
     )
 
     markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton("ðŸ“ Type Message", callback_data="adm_broadcast_text_btn")],
-        [InlineKeyboardButton("ðŸ’Ž Premium Only", callback_data="adm_broadcast_premium_btn")],
+        [InlineKeyboardButton("📝 Type Message", callback_data="adm_broadcast_text_btn")],
+        [InlineKeyboardButton("💎 Premium Only", callback_data="adm_broadcast_premium_btn")],
         [
-            InlineKeyboardButton("ðŸ“Š Stats", callback_data="adm_broadcast_stats"),
-            InlineKeyboardButton("ðŸ”™ Back", callback_data="adm_back_panel")
+            InlineKeyboardButton("📊 Stats", callback_data="adm_broadcast_stats"),
+            InlineKeyboardButton("🔙 Back", callback_data="adm_back_panel")
         ]
     ])
 
@@ -4735,16 +4735,16 @@ async def adm_broadcast_menu_cb(client, query: CallbackQuery):
 @bot.on_callback_query(filters.regex("^adm_broadcast_text_btn$"))
 async def adm_broadcast_text_btn_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     user_state[query.from_user.id] = {"step": "adm_broadcast_text", "_created": time.time()}
     await safe_edit(
         query.message,
-        "ðŸ’€ <b>Type Broadcast Message</b>\n\n"
+        "💀 <b>Type Broadcast Message</b>\n\n"
         "Send the message you want to broadcast to all users.\n"
         "HTML formatting is supported.\n\n"
-        "âš ï¸ Type /cancel to abort.",
+        "⚠️ Type /cancel to abort.",
         InlineKeyboardMarkup([
-            [InlineKeyboardButton("âŒ Cancel", callback_data="adm_broadcast_menu")]
+            [InlineKeyboardButton("❌ Cancel", callback_data="adm_broadcast_menu")]
         ])
     )
 
@@ -4752,15 +4752,15 @@ async def adm_broadcast_text_btn_cb(client, query: CallbackQuery):
 @bot.on_callback_query(filters.regex("^adm_broadcast_premium_btn$"))
 async def adm_broadcast_premium_btn_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     user_state[query.from_user.id] = {"step": "adm_broadcast_premium_text", "_created": time.time()}
     await safe_edit(
         query.message,
-        "ðŸ’€ <b>Premium Broadcast</b>\n\n"
+        "💀 <b>Premium Broadcast</b>\n\n"
         "Send the message to broadcast to <b>premium users only</b>.\n\n"
-        "âš ï¸ Type /cancel to abort.",
+        "⚠️ Type /cancel to abort.",
         InlineKeyboardMarkup([
-            [InlineKeyboardButton("âŒ Cancel", callback_data="adm_broadcast_menu")]
+            [InlineKeyboardButton("❌ Cancel", callback_data="adm_broadcast_menu")]
         ])
     )
 
@@ -4768,50 +4768,50 @@ async def adm_broadcast_premium_btn_cb(client, query: CallbackQuery):
 @bot.on_callback_query(filters.regex("^adm_broadcast_stats$"))
 async def adm_broadcast_stats_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     data = get_data()
     total_bc = data["settings"].get("total_broadcasts", 0)
-    await query.answer(f"ðŸ“Š Total broadcasts: {total_bc}", show_alert=True)
+    await query.answer(f"📊 Total broadcasts: {total_bc}", show_alert=True)
 
 
-# â”€â”€ Database Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Database Section ──────────────────────────────────
 @bot.on_callback_query(filters.regex("^adm_db_menu$"))
 async def adm_db_menu_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
 
     s = get_system_stats()
     backup_exists = os.path.exists(DATA_FILE + ".backup")
     last_backup = "Available" if backup_exists else "None"
 
     text = (
-        f"ðŸ’€ <b>Admin â€” Database Manager</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ’¾ <b>Size:</b> <code>{s['file_size_str']}</code>\n"
-        f"â”‚ ðŸ“ <b>File:</b> <code>{DATA_FILE}</code>\n"
-        f"â”‚ ðŸ”„ <b>Auto Backup:</b> {last_backup}\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ‘¥ Users: <code>{s['total_users']}</code>\n"
-        f"â”‚ ðŸ”‘ Accounts: <code>{s['total_accounts']}</code>\n"
-        f"â”‚ ðŸš€ Campaigns: <code>{s['running'] + s['paused'] + s['completed']}</code>\n"
-        f"â”‚ ðŸ“‹ Logs: <code>{s['admin_log_count']}</code>\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        f"💀 <b>Admin — Database Manager</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ 💾 <b>Size:</b> <code>{s['file_size_str']}</code>\n"
+        f"│ 📁 <b>File:</b> <code>{DATA_FILE}</code>\n"
+        f"│ 🔄 <b>Auto Backup:</b> {last_backup}\n"
+        f"├─────────────────────\n"
+        f"│ 👥 Users: <code>{s['total_users']}</code>\n"
+        f"│ 🔑 Accounts: <code>{s['total_accounts']}</code>\n"
+        f"│ 🚀 Campaigns: <code>{s['running'] + s['paused'] + s['completed']}</code>\n"
+        f"│ 📋 Logs: <code>{s['admin_log_count']}</code>\n"
+        f"└─────────────────────"
     )
 
     markup = InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("ðŸ“¥ Download DB", callback_data="adm_download_db"),
-            InlineKeyboardButton("ðŸ“¤ Upload DB", callback_data="adm_upload_db_info")
+            InlineKeyboardButton("📥 Download DB", callback_data="adm_download_db"),
+            InlineKeyboardButton("📤 Upload DB", callback_data="adm_upload_db_info")
         ],
         [
-            InlineKeyboardButton("ðŸ’¾ Create Backup", callback_data="adm_create_backup"),
-            InlineKeyboardButton("ðŸ”„ Restore Backup", callback_data="adm_restore_backup")
+            InlineKeyboardButton("💾 Create Backup", callback_data="adm_create_backup"),
+            InlineKeyboardButton("🔄 Restore Backup", callback_data="adm_restore_backup")
         ],
         [
-            InlineKeyboardButton("ðŸ—‘ï¸ Reset DB", callback_data="adm_reset_db_confirm"),
-            InlineKeyboardButton("ðŸ§¹ Clean Logs", callback_data="adm_clean_logs")
+            InlineKeyboardButton("🗑️ Reset DB", callback_data="adm_reset_db_confirm"),
+            InlineKeyboardButton("🧹 Clean Logs", callback_data="adm_clean_logs")
         ],
-        [InlineKeyboardButton("ðŸ”™ Admin Panel", callback_data="adm_back_panel")]
+        [InlineKeyboardButton("🔙 Admin Panel", callback_data="adm_back_panel")]
     ])
 
     await safe_edit(query.message, text, markup)
@@ -4820,7 +4820,7 @@ async def adm_db_menu_cb(client, query: CallbackQuery):
 @bot.on_callback_query(filters.regex("^adm_download_db$"))
 async def adm_download_db_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
 
     backup_file = f"skull_backup_{int(time.time())}.json"
     try:
@@ -4828,7 +4828,7 @@ async def adm_download_db_cb(client, query: CallbackQuery):
         backup = {
             "backup_info": {
                 "created_at": time.strftime('%Y-%m-%d %H:%M:%S'),
-                "version": f"SkullAdsBot_v{BOT_VERSION}",
+                "version": f"MarketingBot_v{BOT_VERSION}",
                 "total_users": len(data.get("users", {})),
                 "total_accounts": len(data.get("accounts", {}))
             },
@@ -4840,13 +4840,13 @@ async def adm_download_db_cb(client, query: CallbackQuery):
         await query.message.reply_document(
             document=backup_file,
             caption=(
-                f"ðŸ’€ <b>Database Backup</b>\n\n"
-                f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                f"â”‚ ðŸ“… {time.strftime('%Y-%m-%d %H:%M:%S')}\n"
-                f"â”‚ ðŸ‘¥ Users: <code>{len(data.get('users', {}))}</code>\n"
-                f"â”‚ ðŸ”‘ Accounts: <code>{len(data.get('accounts', {}))}</code>\n"
-                f"â”‚ ðŸ’¾ Size: <code>{file_size}</code>\n"
-                f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+                f"💀 <b>Database Backup</b>\n\n"
+                f"┌─────────────────────\n"
+                f"│ 📅 {time.strftime('%Y-%m-%d %H:%M:%S')}\n"
+                f"│ 👥 Users: <code>{len(data.get('users', {}))}</code>\n"
+                f"│ 🔑 Accounts: <code>{len(data.get('accounts', {}))}</code>\n"
+                f"│ 💾 Size: <code>{file_size}</code>\n"
+                f"└─────────────────────"
             ),
             parse_mode=ParseMode.HTML
         )
@@ -4865,15 +4865,15 @@ async def adm_download_db_cb(client, query: CallbackQuery):
 @bot.on_callback_query(filters.regex("^adm_upload_db_info$"))
 async def adm_upload_db_info_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     await safe_edit(
         query.message,
-        "ðŸ’€ <b>Upload Database</b>\n\n"
+        "💀 <b>Upload Database</b>\n\n"
         "Reply to a JSON backup file with <code>/uploaddb</code>\n\n"
-        "âš ï¸ This will overwrite current data!\n"
+        "⚠️ This will overwrite current data!\n"
         "A backup will be created automatically.",
         InlineKeyboardMarkup([
-            [InlineKeyboardButton("ðŸ”™ Back", callback_data="adm_db_menu")]
+            [InlineKeyboardButton("🔙 Back", callback_data="adm_db_menu")]
         ])
     )
 
@@ -4881,7 +4881,7 @@ async def adm_upload_db_info_cb(client, query: CallbackQuery):
 @bot.on_callback_query(filters.regex("^adm_create_backup$"))
 async def adm_create_backup_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     try:
         data = get_data()
         backup_name = f"manual_backup_{int(time.time())}.json"
@@ -4891,7 +4891,7 @@ async def adm_create_backup_cb(client, query: CallbackQuery):
         data["settings"]["last_backup"] = time.strftime('%Y-%m-%d %H:%M:%S')
         await async_update_data(data)
         add_admin_log("CREATE_BACKUP", query.from_user.id, backup_name)
-        await query.answer(f"âœ… Backup created: {backup_name}", show_alert=True)
+        await query.answer(f"✅ Backup created: {backup_name}", show_alert=True)
     except Exception as e:
         logger.error(f"Backup creation error: {e}")
         await query.answer(f"Error: {str(e)[:100]}", show_alert=True)
@@ -4900,10 +4900,10 @@ async def adm_create_backup_cb(client, query: CallbackQuery):
 @bot.on_callback_query(filters.regex("^adm_restore_backup$"))
 async def adm_restore_backup_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     backup_file = DATA_FILE + ".backup"
     if not os.path.exists(backup_file):
-        return await query.answer("âŒ No auto-backup found!", show_alert=True)
+        return await query.answer("❌ No auto-backup found!", show_alert=True)
     try:
         with open(backup_file, "r", encoding="utf-8") as f:
             backup_data = json.load(f)
@@ -4913,7 +4913,7 @@ async def adm_restore_backup_cb(client, query: CallbackQuery):
             json.dump(current, f, indent=2)
         await async_update_data(backup_data)
         add_admin_log("RESTORE_BACKUP", query.from_user.id, f"Emergency: {emergency}")
-        await query.answer("âœ… Backup restored!", show_alert=True)
+        await query.answer("✅ Backup restored!", show_alert=True)
         await adm_db_menu_cb(client, query)
     except Exception as e:
         logger.error(f"Restore error: {e}")
@@ -4923,22 +4923,22 @@ async def adm_restore_backup_cb(client, query: CallbackQuery):
 @bot.on_callback_query(filters.regex("^adm_reset_db_confirm$"))
 async def adm_reset_db_confirm_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     await safe_edit(
         query.message,
-        "ðŸ’€ <b>âš ï¸ DANGER: Database Reset</b>\n\n"
-        "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        "â”‚ This will DELETE ALL DATA:\n"
-        "â”‚ â€¢ All users\n"
-        "â”‚ â€¢ All accounts/sessions\n"
-        "â”‚ â€¢ All campaigns\n"
-        "â”‚ â€¢ All stats\n"
-        "â”‚ â€¢ All premium entries\n"
-        "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
+        "💀 <b>⚠️ DANGER: Database Reset</b>\n\n"
+        "┌─────────────────────\n"
+        "│ This will DELETE ALL DATA:\n"
+        "│ • All users\n"
+        "│ • All accounts/sessions\n"
+        "│ • All campaigns\n"
+        "│ • All stats\n"
+        "│ • All premium entries\n"
+        "└─────────────────────\n\n"
         "Type <code>CONFIRM RESET</code> to proceed.\n"
         "Type anything else to cancel.",
         InlineKeyboardMarkup([
-            [InlineKeyboardButton("âŒ CANCEL", callback_data="adm_db_menu")]
+            [InlineKeyboardButton("❌ CANCEL", callback_data="adm_db_menu")]
         ])
     )
     user_state[query.from_user.id] = {"step": "adm_confirm_reset", "_created": time.time()}
@@ -4947,20 +4947,20 @@ async def adm_reset_db_confirm_cb(client, query: CallbackQuery):
 @bot.on_callback_query(filters.regex("^adm_clean_logs$"))
 async def adm_clean_logs_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     data = await async_get_data()
     old_count = len(data.get("admin_logs", []))
     data["admin_logs"] = data.get("admin_logs", [])[:50]
     await async_update_data(data)
     cleaned = old_count - len(data["admin_logs"])
-    await query.answer(f"ðŸ§¹ Cleaned {cleaned} old log entries!", show_alert=True)
+    await query.answer(f"🧹 Cleaned {cleaned} old log entries!", show_alert=True)
 
 
-# â”€â”€ Settings Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Settings Section ──────────────────────────────────
 @bot.on_callback_query(filters.regex("^adm_settings$"))
 async def adm_settings_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
 
     data = get_data()
     settings = data.get("settings", {})
@@ -4970,30 +4970,30 @@ async def adm_settings_cb(client, query: CallbackQuery):
     footer_preview = truncate_text(global_footer, 30) if global_footer else "None"
     rate_limit = settings.get("rate_limit_seconds", 5)
 
-    m_btn_text = "ðŸ”´ Disable Maintenance" if m_mode else "ðŸŸ¢ Enable Maintenance"
+    m_btn_text = "🔴 Disable Maintenance" if m_mode else "🟢 Enable Maintenance"
     m_btn_data = "adm_maintenance_off" if m_mode else "adm_maintenance_on"
 
     text = (
-        f"ðŸ’€ <b>Admin â€” Bot Settings</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ›  <b>Maintenance:</b> {'ðŸ”´ ON' if m_mode else 'ðŸŸ¢ OFF'}\n"
-        f"â”‚ ðŸ“¢ <b>Force Join:</b> <code>{force_join}</code>\n"
-        f"â”‚ ðŸ“ <b>Global Footer:</b> {footer_preview}\n"
-        f"â”‚ â³ <b>Rate Limit:</b> <code>{rate_limit}s</code>\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        f"💀 <b>Admin — Bot Settings</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ 🛠 <b>Maintenance:</b> {'🔴 ON' if m_mode else '🟢 OFF'}\n"
+        f"│ 📢 <b>Force Join:</b> <code>{force_join}</code>\n"
+        f"│ 📝 <b>Global Footer:</b> {footer_preview}\n"
+        f"│ ⏳ <b>Rate Limit:</b> <code>{rate_limit}s</code>\n"
+        f"└─────────────────────"
     )
 
     markup = InlineKeyboardMarkup([
         [InlineKeyboardButton(m_btn_text, callback_data=m_btn_data)],
         [
-            InlineKeyboardButton("ðŸ“¢ Set Force Join", callback_data="adm_set_forcejoin_btn"),
-            InlineKeyboardButton("ðŸ“ Set Footer", callback_data="adm_set_footer_btn")
+            InlineKeyboardButton("📢 Set Force Join", callback_data="adm_set_forcejoin_btn"),
+            InlineKeyboardButton("📝 Set Footer", callback_data="adm_set_footer_btn")
         ],
         [
-            InlineKeyboardButton("ðŸ”„ Clear Footer", callback_data="adm_clear_footer"),
-            InlineKeyboardButton("ðŸ”„ Clear Force Join", callback_data="adm_clear_forcejoin")
+            InlineKeyboardButton("🔄 Clear Footer", callback_data="adm_clear_footer"),
+            InlineKeyboardButton("🔄 Clear Force Join", callback_data="adm_clear_forcejoin")
         ],
-        [InlineKeyboardButton("ðŸ”™ Admin Panel", callback_data="adm_back_panel")]
+        [InlineKeyboardButton("🔙 Admin Panel", callback_data="adm_back_panel")]
     ])
 
     await safe_edit(query.message, text, markup)
@@ -5002,40 +5002,40 @@ async def adm_settings_cb(client, query: CallbackQuery):
 @bot.on_callback_query(filters.regex("^adm_maintenance_on$"))
 async def adm_maintenance_on_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     data = await async_get_data()
     data["settings"]["maintenance_mode"] = True
     await async_update_data(data)
     add_admin_log("MAINTENANCE_ON", query.from_user.id)
-    await query.answer("ðŸ”´ Maintenance mode ENABLED!", show_alert=True)
+    await query.answer("🔴 Maintenance mode ENABLED!", show_alert=True)
     await adm_settings_cb(client, query)
 
 
 @bot.on_callback_query(filters.regex("^adm_maintenance_off$"))
 async def adm_maintenance_off_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     data = await async_get_data()
     data["settings"]["maintenance_mode"] = False
     await async_update_data(data)
     add_admin_log("MAINTENANCE_OFF", query.from_user.id)
-    await query.answer("ðŸŸ¢ Maintenance mode DISABLED!", show_alert=True)
+    await query.answer("🟢 Maintenance mode DISABLED!", show_alert=True)
     await adm_settings_cb(client, query)
 
 
 @bot.on_callback_query(filters.regex("^adm_set_forcejoin_btn$"))
 async def adm_set_forcejoin_btn_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     user_state[query.from_user.id] = {"step": "adm_set_forcejoin", "_created": time.time()}
     await safe_edit(
         query.message,
-        "ðŸ’€ <b>Set Force Join Channel</b>\n\n"
+        "💀 <b>Set Force Join Channel</b>\n\n"
         "Send channel username (e.g. <code>@mychannel</code>)\n"
         "Or send <code>off</code> to disable.\n\n"
-        "âš ï¸ Bot must be admin in the channel!",
+        "⚠️ Bot must be admin in the channel!",
         InlineKeyboardMarkup([
-            [InlineKeyboardButton("âŒ Cancel", callback_data="adm_settings")]
+            [InlineKeyboardButton("❌ Cancel", callback_data="adm_settings")]
         ])
     )
 
@@ -5043,16 +5043,16 @@ async def adm_set_forcejoin_btn_cb(client, query: CallbackQuery):
 @bot.on_callback_query(filters.regex("^adm_set_footer_btn$"))
 async def adm_set_footer_btn_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     user_state[query.from_user.id] = {"step": "adm_set_footer", "_created": time.time()}
     await safe_edit(
         query.message,
-        "ðŸ’€ <b>Set Global Ad Footer</b>\n\n"
+        "💀 <b>Set Global Ad Footer</b>\n\n"
         "This text will be appended to all ad messages.\n"
         "Send the footer text, or <code>off</code> to disable.\n\n"
-        "Example:\n<code>ðŸ“¢ Powered by @SkullAdsBot</code>",
+        "Example:\n<code>📢 Powered by @securedsitedns</code>",
         InlineKeyboardMarkup([
-            [InlineKeyboardButton("âŒ Cancel", callback_data="adm_settings")]
+            [InlineKeyboardButton("❌ Cancel", callback_data="adm_settings")]
         ])
     )
 
@@ -5060,32 +5060,32 @@ async def adm_set_footer_btn_cb(client, query: CallbackQuery):
 @bot.on_callback_query(filters.regex("^adm_clear_footer$"))
 async def adm_clear_footer_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     data = await async_get_data()
     data["settings"]["global_ad_footer"] = ""
     await async_update_data(data)
     add_admin_log("CLEAR_FOOTER", query.from_user.id)
-    await query.answer("âœ… Global footer cleared!", show_alert=True)
+    await query.answer("✅ Global footer cleared!", show_alert=True)
     await adm_settings_cb(client, query)
 
 
 @bot.on_callback_query(filters.regex("^adm_clear_forcejoin$"))
 async def adm_clear_forcejoin_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     data = await async_get_data()
     data["settings"]["force_join_channel"] = ""
     await async_update_data(data)
     add_admin_log("CLEAR_FORCEJOIN", query.from_user.id)
-    await query.answer("âœ… Force join disabled!", show_alert=True)
+    await query.answer("✅ Force join disabled!", show_alert=True)
     await adm_settings_cb(client, query)
 
 
-# â”€â”€ Analytics Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Analytics Section ─────────────────────────────────
 @bot.on_callback_query(filters.regex("^adm_analytics$"))
 async def adm_analytics_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
 
     s = get_system_stats()
     data = get_data()
@@ -5103,71 +5103,71 @@ async def adm_analytics_cb(client, query: CallbackQuery):
     login_logout_ratio = round(s["logins"] / max(s["logouts"], 1), 2)
 
     text = (
-        f"ðŸ’€ <b>Admin â€” Analytics Dashboard</b>\n\n"
-        f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ“Š <b>PERFORMANCE METRICS</b>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸš€ Total Sent: <code>{s['total_sent']:,}</code>\n"
-        f"â”‚ âŒ Total Failed: <code>{s['total_failed']:,}</code>\n"
-        f"â”‚ ðŸ“ˆ Success Rate: <code>{success_rate}%</code>\n"
-        f"â”‚ ðŸ“¨ Avg per User: <code>{avg_sent}</code>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ‘¥ <b>USER METRICS</b>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ‘¥ Total: <code>{total_users}</code>\n"
-        f"â”‚ ðŸŸ¢ Active (24h): <code>{active}</code> ({active_pct}%)\n"
-        f"â”‚ ðŸ’Ž Premium: <code>{s['premium_count']}</code>\n"
-        f"â”‚ ðŸ“Š Conversion: <code>"
+        f"💀 <b>Admin — Analytics Dashboard</b>\n\n"
+        f"┌─────────────────────\n"
+        f"│ 📊 <b>PERFORMANCE METRICS</b>\n"
+        f"├─────────────────────\n"
+        f"│ 🚀 Total Sent: <code>{s['total_sent']:,}</code>\n"
+        f"│ ❌ Total Failed: <code>{s['total_failed']:,}</code>\n"
+        f"│ 📈 Success Rate: <code>{success_rate}%</code>\n"
+        f"│ 📨 Avg per User: <code>{avg_sent}</code>\n"
+        f"├─────────────────────\n"
+        f"│ 👥 <b>USER METRICS</b>\n"
+        f"├─────────────────────\n"
+        f"│ 👥 Total: <code>{total_users}</code>\n"
+        f"│ 🟢 Active (24h): <code>{active}</code> ({active_pct}%)\n"
+        f"│ 💎 Premium: <code>{s['premium_count']}</code>\n"
+        f"│ 📊 Conversion: <code>"
         f"{round(s['premium_count'] / max(total_users, 1) * 100, 1)}%</code>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ”‘ <b>SESSION HEALTH</b>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸ“² Login/Logout Ratio: <code>{login_logout_ratio}</code>\n"
-        f"â”‚ ðŸ”‘ Active Sessions: <code>{s['total_accounts']}</code>\n"
-        f"â”‚ âš¡ Engine Tasks: <code>{s['active_engine_tasks']}</code>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸŽ¯ <b>CAMPAIGN HEALTH</b>\n"
-        f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-        f"â”‚ ðŸŸ¢ Running: <code>{s['running']}</code>\n"
-        f"â”‚ ðŸŽ¯ Total Targets: <code>{s['total_targets']}</code>\n"
-        f"â”‚ ðŸ“ Configured: <code>{s['total_configured']}</code>\n"
-        f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        f"├─────────────────────\n"
+        f"│ 🔑 <b>SESSION HEALTH</b>\n"
+        f"├─────────────────────\n"
+        f"│ 📲 Login/Logout Ratio: <code>{login_logout_ratio}</code>\n"
+        f"│ 🔑 Active Sessions: <code>{s['total_accounts']}</code>\n"
+        f"│ ⚡ Engine Tasks: <code>{s['active_engine_tasks']}</code>\n"
+        f"├─────────────────────\n"
+        f"│ 🎯 <b>CAMPAIGN HEALTH</b>\n"
+        f"├─────────────────────\n"
+        f"│ 🟢 Running: <code>{s['running']}</code>\n"
+        f"│ 🎯 Total Targets: <code>{s['total_targets']}</code>\n"
+        f"│ 📝 Configured: <code>{s['total_configured']}</code>\n"
+        f"└─────────────────────"
     )
 
     markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton("ðŸ”„ Refresh", callback_data="adm_analytics")],
-        [InlineKeyboardButton("ðŸ”™ Admin Panel", callback_data="adm_back_panel")]
+        [InlineKeyboardButton("🔄 Refresh", callback_data="adm_analytics")],
+        [InlineKeyboardButton("🔙 Admin Panel", callback_data="adm_back_panel")]
     ])
 
     await safe_edit(query.message, text, markup)
 
 
-# â”€â”€ Banned Users Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Banned Users Section ──────────────────────────────
 @bot.on_callback_query(filters.regex("^adm_banned_list$"))
 async def adm_banned_list_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
 
     data = get_data()
     banned = data.get("banned_users", [])
 
-    text = f"ðŸ’€ <b>Banned Users ({len(banned)})</b>\n\nâ”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
+    text = f"💀 <b>Banned Users ({len(banned)})</b>\n\n┌─────────────────────\n"
 
     if not banned:
-        text += "â”‚ No banned users.\n"
+        text += "│ No banned users.\n"
     else:
         for b_id in banned[:20]:
             user = data["users"].get(str(b_id), {})
             name = truncate_text(sanitize_html(user.get("name", "Unknown")), 12)
-            text += f"â”‚ ðŸš« <code>{b_id}</code> â€¢ {name}\n"
+            text += f"│ 🚫 <code>{b_id}</code> • {name}\n"
         if len(banned) > 20:
-            text += f"â”‚ ... +{len(banned) - 20} more\n"
+            text += f"│ ... +{len(banned) - 20} more\n"
 
-    text += "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+    text += "└─────────────────────"
 
     markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton("ðŸ”“ Unban All", callback_data="adm_unban_all")],
-        [InlineKeyboardButton("ðŸ”™ Admin Panel", callback_data="adm_back_panel")]
+        [InlineKeyboardButton("🔓 Unban All", callback_data="adm_unban_all")],
+        [InlineKeyboardButton("🔙 Admin Panel", callback_data="adm_back_panel")]
     ])
 
     await safe_edit(query.message, text, markup)
@@ -5176,47 +5176,47 @@ async def adm_banned_list_cb(client, query: CallbackQuery):
 @bot.on_callback_query(filters.regex("^adm_unban_all$"))
 async def adm_unban_all_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     data = await async_get_data()
     count = len(data.get("banned_users", []))
     data["banned_users"] = []
     await async_update_data(data)
     add_admin_log("UNBAN_ALL", query.from_user.id, f"{count} users unbanned")
-    await query.answer(f"âœ… {count} users unbanned!", show_alert=True)
+    await query.answer(f"✅ {count} users unbanned!", show_alert=True)
     await adm_banned_list_cb(client, query)
 
 
-# â”€â”€ Admin Logs Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Admin Logs Section ────────────────────────────────
 @bot.on_callback_query(filters.regex("^adm_logs$"))
 async def adm_logs_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
 
     data = get_data()
     logs = data.get("admin_logs", [])
 
-    text = f"ðŸ’€ <b>Admin Action Logs ({len(logs)})</b>\n\nâ”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
+    text = f"💀 <b>Admin Action Logs ({len(logs)})</b>\n\n┌─────────────────────\n"
 
     if not logs:
-        text += "â”‚ No logs yet.\n"
+        text += "│ No logs yet.\n"
     else:
         for log in logs[:15]:
             action = log.get("action", "?")
             ts = log.get("timestamp", "?")[:16]
             details = truncate_text(log.get("details", ""), 25)
-            detail_str = f" â€¢ {details}" if details else ""
-            text += f"â”‚ [{ts}] {action}{detail_str}\n"
+            detail_str = f" • {details}" if details else ""
+            text += f"│ [{ts}] {action}{detail_str}\n"
         if len(logs) > 15:
-            text += f"â”‚ ... +{len(logs) - 15} more\n"
+            text += f"│ ... +{len(logs) - 15} more\n"
 
-    text += "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+    text += "└─────────────────────"
 
     markup = InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("ðŸ—‘ï¸ Clear Logs", callback_data="adm_clear_all_logs"),
-            InlineKeyboardButton("ðŸ“¥ Export", callback_data="adm_export_logs")
+            InlineKeyboardButton("🗑️ Clear Logs", callback_data="adm_clear_all_logs"),
+            InlineKeyboardButton("📥 Export", callback_data="adm_export_logs")
         ],
-        [InlineKeyboardButton("ðŸ”™ Admin Panel", callback_data="adm_back_panel")]
+        [InlineKeyboardButton("🔙 Admin Panel", callback_data="adm_back_panel")]
     ])
 
     await safe_edit(query.message, text, markup)
@@ -5225,19 +5225,19 @@ async def adm_logs_cb(client, query: CallbackQuery):
 @bot.on_callback_query(filters.regex("^adm_clear_all_logs$"))
 async def adm_clear_all_logs_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     data = await async_get_data()
     count = len(data.get("admin_logs", []))
     data["admin_logs"] = []
     await async_update_data(data)
-    await query.answer(f"ðŸ—‘ï¸ {count} logs cleared!", show_alert=True)
+    await query.answer(f"🗑️ {count} logs cleared!", show_alert=True)
     await adm_logs_cb(client, query)
 
 
 @bot.on_callback_query(filters.regex("^adm_export_logs$"))
 async def adm_export_logs_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     data = get_data()
     logs = data.get("admin_logs", [])
     if not logs:
@@ -5248,7 +5248,7 @@ async def adm_export_logs_cb(client, query: CallbackQuery):
             json.dump(logs, f, indent=2)
         await query.message.reply_document(
             document=log_file,
-            caption=f"ðŸ’€ Admin Logs â€” {len(logs)} entries",
+            caption=f"💀 Admin Logs — {len(logs)} entries",
             parse_mode=ParseMode.HTML
         )
     except Exception as e:
@@ -5262,28 +5262,28 @@ async def adm_export_logs_cb(client, query: CallbackQuery):
                 pass
 
 
-# â”€â”€ Search User â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Search User ───────────────────────────────────────
 @bot.on_callback_query(filters.regex("^adm_search$"))
 async def adm_search_cb(client, query: CallbackQuery):
     if not is_admin(query.from_user.id):
-        return await query.answer("âŒ Admin only!", show_alert=True)
+        return await query.answer("❌ Admin only!", show_alert=True)
     user_state[query.from_user.id] = {"step": "adm_search_user", "_created": time.time()}
     await safe_edit(
         query.message,
-        "ðŸ’€ <b>Search Users</b>\n\n"
+        "💀 <b>Search Users</b>\n\n"
         "Send a user ID, name, or username to search.\n\n"
         "Example:\n"
-        "â€¢ <code>123456789</code>\n"
-        "â€¢ <code>John</code>\n"
-        "â€¢ <code>username</code>",
+        "• <code>123456789</code>\n"
+        "• <code>John</code>\n"
+        "• <code>username</code>",
         InlineKeyboardMarkup([
-            [InlineKeyboardButton("âŒ Cancel", callback_data="adm_back_panel")]
+            [InlineKeyboardButton("❌ Cancel", callback_data="adm_back_panel")]
         ])
     )
 
 
 # =====================================================
-# ðŸ‘‘ ADMIN COMMANDS â€” TEXT BASED
+# 👑 ADMIN COMMANDS — TEXT BASED
 # =====================================================
 @bot.on_message(filters.command("ban") & filters.private)
 async def ban_cmd(client, message: Message):
@@ -5291,14 +5291,14 @@ async def ban_cmd(client, message: Message):
         return
     if len(message.command) < 2:
         return await message.reply_text(
-            "ðŸ’€ <b>Usage:</b> <code>/ban [user_id]</code>",
+            "💀 <b>Usage:</b> <code>/ban [user_id]</code>",
             parse_mode=ParseMode.HTML
         )
     try:
         ban_id = int(message.command[1])
         if ban_id in ADMIN_IDS:
             return await message.reply_text(
-                "âŒ Cannot ban an admin!", parse_mode=ParseMode.HTML
+                "❌ Cannot ban an admin!", parse_mode=ParseMode.HTML
             )
         data = await async_get_data()
         if ban_id not in data["banned_users"]:
@@ -5311,17 +5311,17 @@ async def ban_cmd(client, message: Message):
 
         user = data["users"].get(str(ban_id), {})
         await message.reply_text(
-            f"ðŸ’€ <b>User Banned!</b>\n\n"
-            f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            f"â”‚ ðŸ‘¤ Name: {sanitize_html(user.get('name', 'Unknown'))}\n"
-            f"â”‚ ðŸ†” ID: <code>{ban_id}</code>\n"
-            f"â”‚ ðŸš« Campaign: Paused\n"
-            f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+            f"💀 <b>User Banned!</b>\n\n"
+            f"┌─────────────────────\n"
+            f"│ 👤 Name: {sanitize_html(user.get('name', 'Unknown'))}\n"
+            f"│ 🆔 ID: <code>{ban_id}</code>\n"
+            f"│ 🚫 Campaign: Paused\n"
+            f"└─────────────────────",
             parse_mode=ParseMode.HTML
         )
-        await safe_send(ban_id, "ðŸ’€ <b>You have been banned from Skull Ads Bot.</b>\nContact @securedsitedns for support.")
+        await safe_send(ban_id, "💀 <b>You have been banned from Marketing Bot.</b>\nContact @securedsitedns for support.")
     except ValueError:
-        await message.reply_text("âŒ Invalid ID.", parse_mode=ParseMode.HTML)
+        await message.reply_text("❌ Invalid ID.", parse_mode=ParseMode.HTML)
 
 
 @bot.on_message(filters.command("unban") & filters.private)
@@ -5330,7 +5330,7 @@ async def unban_cmd(client, message: Message):
         return
     if len(message.command) < 2:
         return await message.reply_text(
-            "ðŸ’€ <b>Usage:</b> <code>/unban [user_id]</code>", parse_mode=ParseMode.HTML
+            "💀 <b>Usage:</b> <code>/unban [user_id]</code>", parse_mode=ParseMode.HTML
         )
     try:
         unban_id = int(message.command[1])
@@ -5342,13 +5342,13 @@ async def unban_cmd(client, message: Message):
         await async_update_data(data)
         add_admin_log("UNBAN_USER", message.from_user.id, f"Unbanned {unban_id}")
         await message.reply_text(
-            f"ðŸ’€ <b>User {'Unbanned' if was_banned else 'Was Not Banned'}!</b>\n"
-            f"ðŸ†” ID: <code>{unban_id}</code>", parse_mode=ParseMode.HTML
+            f"💀 <b>User {'Unbanned' if was_banned else 'Was Not Banned'}!</b>\n"
+            f"🆔 ID: <code>{unban_id}</code>", parse_mode=ParseMode.HTML
         )
         if was_banned:
-            await safe_send(unban_id, "ðŸ’€ <b>You have been unbanned!</b>\nWelcome back. ðŸŽ‰")
+            await safe_send(unban_id, "💀 <b>You have been unbanned!</b>\nWelcome back. 🎉")
     except ValueError:
-        await message.reply_text("âŒ Invalid ID.", parse_mode=ParseMode.HTML)
+        await message.reply_text("❌ Invalid ID.", parse_mode=ParseMode.HTML)
 
 
 @bot.on_message(filters.command("maintenance") & filters.private)
@@ -5357,7 +5357,7 @@ async def maintenance_cmd(client, message: Message):
         return
     if len(message.command) < 2:
         return await message.reply_text(
-            "ðŸ’€ <b>Usage:</b> <code>/maintenance on</code> or <code>off</code>", parse_mode=ParseMode.HTML
+            "💀 <b>Usage:</b> <code>/maintenance on</code> or <code>off</code>", parse_mode=ParseMode.HTML
         )
     st = message.command[1].lower() in ['on', 'true', '1', 'yes']
     data = await async_get_data()
@@ -5365,7 +5365,7 @@ async def maintenance_cmd(client, message: Message):
     await async_update_data(data)
     add_admin_log(f"MAINTENANCE_{'ON' if st else 'OFF'}", message.from_user.id)
     await message.reply_text(
-        f"ðŸ’€ <b>Maintenance: {'ðŸ”´ ON' if st else 'ðŸŸ¢ OFF'}</b>", parse_mode=ParseMode.HTML
+        f"💀 <b>Maintenance: {'🔴 ON' if st else '🟢 OFF'}</b>", parse_mode=ParseMode.HTML
     )
 
 
@@ -5382,7 +5382,7 @@ async def pauseall_cmd(client, message: Message):
     await async_update_data(data)
     add_admin_log("PAUSE_ALL", message.from_user.id, f"{count} paused")
     await message.reply_text(
-        f"ðŸ’€ <b>Emergency Stop!</b>\nâ”‚ ðŸ›‘ {count} campaigns paused.", parse_mode=ParseMode.HTML
+        f"💀 <b>Emergency Stop!</b>\n│ 🛑 {count} campaigns paused.", parse_mode=ParseMode.HTML
     )
 
 
@@ -5401,7 +5401,7 @@ async def resumeall_cmd(client, message: Message):
     await async_update_data(data)
     add_admin_log("RESUME_ALL", message.from_user.id, f"{count} resumed")
     await message.reply_text(
-        f"ðŸ’€ <b>Master Resume!</b>\nâ”‚ ðŸš€ {count} campaigns resumed.", parse_mode=ParseMode.HTML
+        f"💀 <b>Master Resume!</b>\n│ 🚀 {count} campaigns resumed.", parse_mode=ParseMode.HTML
     )
 
 
@@ -5411,14 +5411,14 @@ async def addpremium_cmd(client, message: Message):
         return
     if len(message.command) < 3:
         return await message.reply_text(
-            "ðŸ’€ <b>Usage:</b> <code>/addpremium [user_id] [plan]</code>\n"
+            "💀 <b>Usage:</b> <code>/addpremium [user_id] [plan]</code>\n"
             "<b>Plans:</b> basic | pro | elite", parse_mode=ParseMode.HTML
         )
     try:
         target_id = int(message.command[1])
         plan_key = message.command[2].lower()
         if plan_key not in PLANS or plan_key == "free":
-            return await message.reply_text("âŒ Invalid plan. Use: basic | pro | elite", parse_mode=ParseMode.HTML)
+            return await message.reply_text("❌ Invalid plan. Use: basic | pro | elite", parse_mode=ParseMode.HTML)
         data = await async_get_data()
         data["premium_users"][str(target_id)] = {
             "plan": plan_key, "added_by": message.from_user.id,
@@ -5426,15 +5426,15 @@ async def addpremium_cmd(client, message: Message):
         }
         await async_update_data(data)
         plan_info = PLANS[plan_key]
-        add_admin_log("ADD_PREMIUM", message.from_user.id, f"{target_id} â†’ {plan_key}")
+        add_admin_log("ADD_PREMIUM", message.from_user.id, f"{target_id} → {plan_key}")
         await message.reply_text(
-            f"ðŸ’€ <b>Premium Granted!</b>\nâ”‚ ðŸ†” {target_id} â†’ {plan_info['name']}\nâ”‚ ðŸ‘¥ Slots: {plan_info['accounts']}",
+            f"💀 <b>Premium Granted!</b>\n│ 🆔 {target_id} → {plan_info['name']}\n│ 👥 Slots: {plan_info['accounts']}",
             parse_mode=ParseMode.HTML
         )
         await safe_send(target_id,
-            f"ðŸ’€ <b>Premium Activated!</b>\nâ”‚ ðŸŽ‰ Plan: {plan_info['name']}\nâ”‚ ðŸ‘¥ Slots: {plan_info['accounts']}")
+            f"💀 <b>Premium Activated!</b>\n│ 🎉 Plan: {plan_info['name']}\n│ 👥 Slots: {plan_info['accounts']}")
     except ValueError:
-        await message.reply_text("âŒ Invalid user ID.", parse_mode=ParseMode.HTML)
+        await message.reply_text("❌ Invalid user ID.", parse_mode=ParseMode.HTML)
 
 
 @bot.on_message(filters.command("removepremium") & filters.private)
@@ -5442,7 +5442,7 @@ async def removepremium_cmd(client, message: Message):
     if not is_admin(message.from_user.id):
         return
     if len(message.command) < 2:
-        return await message.reply_text("ðŸ’€ <b>Usage:</b> <code>/removepremium [user_id]</code>", parse_mode=ParseMode.HTML)
+        return await message.reply_text("💀 <b>Usage:</b> <code>/removepremium [user_id]</code>", parse_mode=ParseMode.HTML)
     try:
         target_id = str(int(message.command[1]))
         data = await async_get_data()
@@ -5452,12 +5452,12 @@ async def removepremium_cmd(client, message: Message):
             await async_update_data(data)
             add_admin_log("REMOVE_PREMIUM", message.from_user.id, f"User {target_id}")
         await message.reply_text(
-            f"ðŸ’€ <b>{'Premium Removed' if removed else 'Not Found'}!</b>\nðŸ†” ID: <code>{target_id}</code>",
+            f"💀 <b>{'Premium Removed' if removed else 'Not Found'}!</b>\n🆔 ID: <code>{target_id}</code>",
             parse_mode=ParseMode.HTML)
         if removed:
-            await safe_send(int(target_id), "ðŸ’€ <b>Your premium has been removed.</b>\nContact @securedsitedns for renewal.")
+            await safe_send(int(target_id), "💀 <b>Your premium has been removed.</b>\nContact @securedsitedns for renewal.")
     except ValueError:
-        await message.reply_text("âŒ Invalid ID.", parse_mode=ParseMode.HTML)
+        await message.reply_text("❌ Invalid ID.", parse_mode=ParseMode.HTML)
 
 
 @bot.on_message(filters.command("userinfo") & filters.private)
@@ -5465,13 +5465,13 @@ async def userinfo_cmd(client, message: Message):
     if not is_admin(message.from_user.id):
         return
     if len(message.command) < 2:
-        return await message.reply_text("ðŸ’€ <b>Usage:</b> <code>/userinfo [user_id]</code>", parse_mode=ParseMode.HTML)
+        return await message.reply_text("💀 <b>Usage:</b> <code>/userinfo [user_id]</code>", parse_mode=ParseMode.HTML)
     try:
         target_id = int(message.command[1])
         data = get_data()
         user = data["users"].get(str(target_id), {})
         if not user:
-            return await message.reply_text("âŒ User not found.", parse_mode=ParseMode.HTML)
+            return await message.reply_text("❌ User not found.", parse_mode=ParseMode.HTML)
 
         user_accs = {k: v for k, v in data["accounts"].items() if v.get("user_id") == target_id}
         camp = data["campaigns"].get(str(target_id), {})
@@ -5484,33 +5484,33 @@ async def userinfo_cmd(client, message: Message):
         camp_status = camp.get("status", "N/A")
         ref_count = len(data.get("referrals", {}).get(str(target_id), []))
 
-        status_map = {"RUNNING": "ðŸŸ¢", "PAUSED": "ðŸ”´", "COMPLETED": "âœ…", "IDLE": "âšª"}
-        status_icon = status_map.get(camp_status, "âšª")
+        status_map = {"RUNNING": "🟢", "PAUSED": "🔴", "COMPLETED": "✅", "IDLE": "⚪"}
+        status_icon = status_map.get(camp_status, "⚪")
         total_ops = stats["total_sent"] + stats["failed"]
         sr = round((stats["total_sent"] / total_ops * 100), 1) if total_ops > 0 else 0
 
         text = (
-            f"ðŸ’€ <b>User Profile</b>\n\n"
-            f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            f"â”‚ ðŸ‘¤ {sanitize_html(user.get('name', 'N/A'))}\n"
-            f"â”‚ ðŸ†” <code>{target_id}</code> | @{user.get('username', 'None')}\n"
-            f"â”‚ ðŸ“… Joined: {user.get('joined_date', 'N/A')}\n"
-            f"â”‚ ðŸ• Active: {user.get('last_active', 'N/A')}\n"
-            f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            f"â”‚ ðŸ’Ž {plan} | ðŸ‘¥ {len(user_accs)}/{limit}\n"
-            f"â”‚ ðŸ“± {', '.join(phones) or 'None'}\n"
-            f"â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-            f"â”‚ {status_icon} {camp_status} | ðŸŽ¯ {len(camp.get('targets', []))}\n"
-            f"â”‚ ðŸš€ Sent: {stats['total_sent']:,} | âŒ {stats['failed']:,} | ðŸ“ˆ {sr}%\n"
-            f"â”‚ ðŸ”— Referrals: {ref_count} | {'ðŸš« BANNED' if is_banned else 'âœ… Active'}\n"
-            f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+            f"💀 <b>User Profile</b>\n\n"
+            f"┌─────────────────────\n"
+            f"│ 👤 {sanitize_html(user.get('name', 'N/A'))}\n"
+            f"│ 🆔 <code>{target_id}</code> | @{user.get('username', 'None')}\n"
+            f"│ 📅 Joined: {user.get('joined_date', 'N/A')}\n"
+            f"│ 🕐 Active: {user.get('last_active', 'N/A')}\n"
+            f"├─────────────────────\n"
+            f"│ 💎 {plan} | 👥 {len(user_accs)}/{limit}\n"
+            f"│ 📱 {', '.join(phones) or 'None'}\n"
+            f"├─────────────────────\n"
+            f"│ {status_icon} {camp_status} | 🎯 {len(camp.get('targets', []))}\n"
+            f"│ 🚀 Sent: {stats['total_sent']:,} | ❌ {stats['failed']:,} | 📈 {sr}%\n"
+            f"│ 🔗 Referrals: {ref_count} | {'🚫 BANNED' if is_banned else '✅ Active'}\n"
+            f"└─────────────────────"
         )
         await message.reply_text(text, parse_mode=ParseMode.HTML)
     except ValueError:
-        await message.reply_text("âŒ Invalid ID.", parse_mode=ParseMode.HTML)
+        await message.reply_text("❌ Invalid ID.", parse_mode=ParseMode.HTML)
     except Exception as e:
         logger.error(f"Userinfo error: {e}")
-        await message.reply_text(f"âŒ Error: {sanitize_html(str(e)[:200])}", parse_mode=ParseMode.HTML)
+        await message.reply_text(f"❌ Error: {sanitize_html(str(e)[:200])}", parse_mode=ParseMode.HTML)
 
 
 @bot.on_message(filters.command("listusers") & filters.private)
@@ -5520,17 +5520,17 @@ async def listusers_cmd(client, message: Message):
     data = get_data()
     users = list(data["users"].values())
     if not users:
-        return await message.reply_text("ðŸ’€ No users found.", parse_mode=ParseMode.HTML)
+        return await message.reply_text("💀 No users found.", parse_mode=ParseMode.HTML)
     users.sort(key=lambda x: x.get("joined_date", ""), reverse=True)
-    text = f"ðŸ’€ <b>All Users ({len(users)})</b>\n\nâ”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
+    text = f"💀 <b>All Users ({len(users)})</b>\n\n┌─────────────────────\n"
     for u in users[:30]:
         uid = u.get("user_id", "?")
         name = truncate_text(sanitize_html(u.get("name", "N/A")), 12)
-        tag = " ðŸš«" if uid in data.get("banned_users", []) else ""
-        text += f"â”‚ <code>{uid}</code>{tag} â€¢ {name}\n"
+        tag = " 🚫" if uid in data.get("banned_users", []) else ""
+        text += f"│ <code>{uid}</code>{tag} • {name}\n"
     if len(users) > 30:
-        text += f"â”‚ ... +{len(users) - 30} more\n"
-    text += "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        text += f"│ ... +{len(users) - 30} more\n"
+    text += "└─────────────────────"
     await message.reply_text(text, parse_mode=ParseMode.HTML)
 
 
@@ -5541,14 +5541,14 @@ async def listpremium_cmd(client, message: Message):
     data = get_data()
     premium = data.get("premium_users", {})
     if not premium:
-        return await message.reply_text("ðŸ’€ No premium users.", parse_mode=ParseMode.HTML)
-    text = f"ðŸ’€ <b>Premium Users ({len(premium)})</b>\n\nâ”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
+        return await message.reply_text("💀 No premium users.", parse_mode=ParseMode.HTML)
+    text = f"💀 <b>Premium Users ({len(premium)})</b>\n\n┌─────────────────────\n"
     for uid_str, info in premium.items():
         plan_name = PLANS.get(info.get("plan", "?"), {}).get("name", "?")
         user = data["users"].get(uid_str, {})
         name = truncate_text(sanitize_html(user.get("name", "N/A")), 12)
-        text += f"â”‚ <code>{uid_str}</code> â€¢ {name} â€¢ {plan_name}\n"
-    text += "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        text += f"│ <code>{uid_str}</code> • {name} • {plan_name}\n"
+    text += "└─────────────────────"
     await message.reply_text(text, parse_mode=ParseMode.HTML)
 
 
@@ -5559,15 +5559,15 @@ async def listbanned_cmd(client, message: Message):
     data = get_data()
     banned = data.get("banned_users", [])
     if not banned:
-        return await message.reply_text("ðŸ’€ No banned users.", parse_mode=ParseMode.HTML)
-    text = f"ðŸ’€ <b>Banned Users ({len(banned)})</b>\n\nâ”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
+        return await message.reply_text("💀 No banned users.", parse_mode=ParseMode.HTML)
+    text = f"💀 <b>Banned Users ({len(banned)})</b>\n\n┌─────────────────────\n"
     for b_id in banned[:30]:
         user = data["users"].get(str(b_id), {})
         name = truncate_text(sanitize_html(user.get("name", "Unknown")), 12)
-        text += f"â”‚ ðŸš« <code>{b_id}</code> â€¢ {name}\n"
+        text += f"│ 🚫 <code>{b_id}</code> • {name}\n"
     if len(banned) > 30:
-        text += f"â”‚ ... +{len(banned) - 30} more\n"
-    text += "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        text += f"│ ... +{len(banned) - 30} more\n"
+    text += "└─────────────────────"
     await message.reply_text(text, parse_mode=ParseMode.HTML)
 
 
@@ -5576,7 +5576,7 @@ async def searchuser_cmd(client, message: Message):
     if not is_admin(message.from_user.id):
         return
     if len(message.command) < 2:
-        return await message.reply_text("ðŸ’€ <b>Usage:</b> <code>/searchuser [query]</code>", parse_mode=ParseMode.HTML)
+        return await message.reply_text("💀 <b>Usage:</b> <code>/searchuser [query]</code>", parse_mode=ParseMode.HTML)
     query_str = " ".join(message.command[1:]).lower()
     data = get_data()
     results = []
@@ -5586,17 +5586,17 @@ async def searchuser_cmd(client, message: Message):
                 query_str in u.get("username", "").lower()):
             results.append((uid_str, u))
     if not results:
-        return await message.reply_text("ðŸ’€ No users found.", parse_mode=ParseMode.HTML)
-    text = f"ðŸ’€ <b>Search: '{sanitize_html(query_str)}' ({len(results)})</b>\n\nâ”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
+        return await message.reply_text("💀 No users found.", parse_mode=ParseMode.HTML)
+    text = f"💀 <b>Search: '{sanitize_html(query_str)}' ({len(results)})</b>\n\n┌─────────────────────\n"
     for uid_str, u in results[:15]:
         uid = u.get("user_id", "?")
         name = truncate_text(sanitize_html(u.get("name", "N/A")), 12)
         uname = f"@{u['username']}" if u.get("username") else "No @"
-        tag = " ðŸš«" if uid in data.get("banned_users", []) else ""
-        text += f"â”‚ <code>{uid}</code>{tag} â€¢ {name} â€¢ {uname}\n"
+        tag = " 🚫" if uid in data.get("banned_users", []) else ""
+        text += f"│ <code>{uid}</code>{tag} • {name} • {uname}\n"
     if len(results) > 15:
-        text += f"â”‚ ... +{len(results) - 15} more\n"
-    text += "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        text += f"│ ... +{len(results) - 15} more\n"
+    text += "└─────────────────────"
     await message.reply_text(text, parse_mode=ParseMode.HTML)
 
 
@@ -5606,7 +5606,7 @@ async def broadcast_cmd(client, message: Message):
         return
     data = get_data()
     total = len(data["users"])
-    msg = await message.reply_text(f"ðŸ“¢ <b>Broadcasting to {total} users...</b>", parse_mode=ParseMode.HTML)
+    msg = await message.reply_text(f"📢 <b>Broadcasting to {total} users...</b>", parse_mode=ParseMode.HTML)
     s, f_count = 0, 0
     for uid_str in data["users"]:
         try:
@@ -5627,7 +5627,7 @@ async def broadcast_cmd(client, message: Message):
     await async_update_data(data)
     add_admin_log("BROADCAST", message.from_user.id, f"Sent: {s}, Failed: {f_count}")
     await msg.edit_text(
-        f"ðŸ’€ <b>Broadcast Done!</b>\nâ”‚ âœ… Sent: {s} | âŒ Failed: {f_count} | ðŸ“Š Total: {total}",
+        f"💀 <b>Broadcast Done!</b>\n│ ✅ Sent: {s} | ❌ Failed: {f_count} | 📊 Total: {total}",
         parse_mode=ParseMode.HTML)
 
 
@@ -5643,12 +5643,12 @@ async def getdb_cmd(client, message: Message):
         with open(backup_file, "w", encoding="utf-8") as f:
             json.dump(backup, f, indent=2, ensure_ascii=False)
         await message.reply_document(document=backup_file,
-            caption=f"ðŸ’€ <b>DB Backup</b>\nðŸ‘¥ {len(data.get('users', {}))} users | ðŸ”‘ {len(data.get('accounts', {}))} accounts",
+            caption=f"💀 <b>DB Backup</b>\n👥 {len(data.get('users', {}))} users | 🔑 {len(data.get('accounts', {}))} accounts",
             parse_mode=ParseMode.HTML)
         add_admin_log("DOWNLOAD_DB", message.from_user.id)
     except Exception as e:
         logger.error(f"getdb error: {e}")
-        await message.reply_text(f"âŒ Error: {sanitize_html(str(e)[:200])}", parse_mode=ParseMode.HTML)
+        await message.reply_text(f"❌ Error: {sanitize_html(str(e)[:200])}", parse_mode=ParseMode.HTML)
     finally:
         if os.path.exists(backup_file):
             try:
@@ -5662,8 +5662,8 @@ async def uploaddb_cmd(client, message: Message):
     if not is_admin(message.from_user.id):
         return
     if not message.reply_to_message or not message.reply_to_message.document:
-        return await message.reply_text("ðŸ’€ Reply to a JSON file with <code>/uploaddb</code>", parse_mode=ParseMode.HTML)
-    wait_msg = await message.reply_text("â³ <b>Restoring database...</b>", parse_mode=ParseMode.HTML)
+        return await message.reply_text("💀 Reply to a JSON file with <code>/uploaddb</code>", parse_mode=ParseMode.HTML)
+    wait_msg = await message.reply_text("⏳ <b>Restoring database...</b>", parse_mode=ParseMode.HTML)
     temp_file = f"temp_upload_{int(time.time())}.json"
     try:
         await message.reply_to_message.download(temp_file)
@@ -5674,7 +5674,7 @@ async def uploaddb_cmd(client, message: Message):
         elif "users" in uploaded:
             new_data = uploaded
         else:
-            return await wait_msg.edit_text("âŒ Invalid format!", parse_mode=ParseMode.HTML)
+            return await wait_msg.edit_text("❌ Invalid format!", parse_mode=ParseMode.HTML)
         current = get_data()
         emergency = f"pre_upload_{int(time.time())}.json"
         with open(emergency, "w", encoding="utf-8") as f:
@@ -5682,13 +5682,13 @@ async def uploaddb_cmd(client, message: Message):
         await async_update_data(new_data)
         add_admin_log("UPLOAD_DB", message.from_user.id, f"Backup: {emergency}")
         await wait_msg.edit_text(
-            f"ðŸ’€ <b>Database Restored!</b>\nâ”‚ ðŸ‘¥ {len(new_data.get('users', {}))} users | ðŸ’¾ {emergency}",
+            f"💀 <b>Database Restored!</b>\n│ 👥 {len(new_data.get('users', {}))} users | 💾 {emergency}",
             parse_mode=ParseMode.HTML)
     except json.JSONDecodeError:
-        await wait_msg.edit_text("âŒ Invalid JSON file!", parse_mode=ParseMode.HTML)
+        await wait_msg.edit_text("❌ Invalid JSON file!", parse_mode=ParseMode.HTML)
     except Exception as e:
         logger.error(f"uploaddb error: {e}")
-        await wait_msg.edit_text(f"âŒ Error: {sanitize_html(str(e)[:200])}", parse_mode=ParseMode.HTML)
+        await wait_msg.edit_text(f"❌ Error: {sanitize_html(str(e)[:200])}", parse_mode=ParseMode.HTML)
     finally:
         if os.path.exists(temp_file):
             try:
@@ -5703,7 +5703,7 @@ async def resetdb_cmd(client, message: Message):
         return
     user_state[message.from_user.id] = {"step": "adm_confirm_reset", "_created": time.time()}
     await message.reply_text(
-        "ðŸ’€ <b>âš ï¸ DANGER: Full Database Reset</b>\n\n"
+        "💀 <b>⚠️ DANGER: Full Database Reset</b>\n\n"
         "Type <code>CONFIRM RESET</code> to proceed.\nAnything else = cancel.",
         parse_mode=ParseMode.HTML)
 
@@ -5716,18 +5716,18 @@ async def globalfooter_cmd(client, message: Message):
         data = get_data()
         current = data["settings"].get("global_ad_footer", "None")
         return await message.reply_text(
-            f"ðŸ’€ <b>Global Footer:</b> <code>{sanitize_html(current or 'None')}</code>\n"
+            f"💀 <b>Global Footer:</b> <code>{sanitize_html(current or 'None')}</code>\n"
             f"Usage: <code>/globalfooter [text]</code> or <code>off</code>", parse_mode=ParseMode.HTML)
     footer_text = " ".join(message.command[1:])
     data = await async_get_data()
     if footer_text.lower() in ["off", "none", "clear", "remove"]:
         data["settings"]["global_ad_footer"] = ""
         await async_update_data(data)
-        return await message.reply_text("âœ… Global footer cleared!", parse_mode=ParseMode.HTML)
+        return await message.reply_text("✅ Global footer cleared!", parse_mode=ParseMode.HTML)
     data["settings"]["global_ad_footer"] = footer_text
     await async_update_data(data)
     add_admin_log("SET_FOOTER", message.from_user.id, truncate_text(footer_text, 50))
-    await message.reply_text(f"âœ… <b>Footer set!</b>\n<code>{sanitize_html(footer_text)}</code>", parse_mode=ParseMode.HTML)
+    await message.reply_text(f"✅ <b>Footer set!</b>\n<code>{sanitize_html(footer_text)}</code>", parse_mode=ParseMode.HTML)
 
 
 @bot.on_message(filters.command("forcejoin") & filters.private)
@@ -5738,21 +5738,21 @@ async def forcejoin_cmd(client, message: Message):
         data = get_data()
         current = data["settings"].get("force_join_channel", "Disabled")
         return await message.reply_text(
-            f"ðŸ’€ <b>Force Join:</b> <code>{current or 'Disabled'}</code>\n"
+            f"💀 <b>Force Join:</b> <code>{current or 'Disabled'}</code>\n"
             f"Usage: <code>/forcejoin @channel</code> or <code>off</code>", parse_mode=ParseMode.HTML)
     channel = message.command[1].strip()
     data = await async_get_data()
     if channel.lower() in ["off", "none", "disable", "remove"]:
         data["settings"]["force_join_channel"] = ""
         await async_update_data(data)
-        return await message.reply_text("âœ… Force join disabled!", parse_mode=ParseMode.HTML)
+        return await message.reply_text("✅ Force join disabled!", parse_mode=ParseMode.HTML)
     if not channel.startswith("@"):
         channel = f"@{channel}"
     data["settings"]["force_join_channel"] = channel
     await async_update_data(data)
     add_admin_log("SET_FORCEJOIN", message.from_user.id, channel)
     await message.reply_text(
-        f"âœ… <b>Force join set!</b> Channel: <code>{channel}</code>\nâš ï¸ Bot must be admin!", parse_mode=ParseMode.HTML)
+        f"✅ <b>Force join set!</b> Channel: <code>{channel}</code>\n⚠️ Bot must be admin!", parse_mode=ParseMode.HTML)
 
 
 @bot.on_message(filters.command("logs") & filters.private)
@@ -5762,22 +5762,22 @@ async def logs_cmd(client, message: Message):
     data = get_data()
     logs = data.get("admin_logs", [])
     if not logs:
-        return await message.reply_text("ðŸ’€ No admin logs.", parse_mode=ParseMode.HTML)
-    text = f"ðŸ’€ <b>Recent Logs ({len(logs)})</b>\n\nâ”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
+        return await message.reply_text("💀 No admin logs.", parse_mode=ParseMode.HTML)
+    text = f"💀 <b>Recent Logs ({len(logs)})</b>\n\n┌─────────────────────\n"
     for log in logs[:20]:
         action = log.get("action", "?")
         ts = log.get("timestamp", "?")[:16]
         details = truncate_text(log.get("details", ""), 30)
-        detail_str = f" â€¢ {details}" if details else ""
-        text += f"â”‚ [{ts}] {action}{detail_str}\n"
+        detail_str = f" • {details}" if details else ""
+        text += f"│ [{ts}] {action}{detail_str}\n"
     if len(logs) > 20:
-        text += f"â”‚ ... +{len(logs) - 20} more\n"
-    text += "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€"
+        text += f"│ ... +{len(logs) - 20} more\n"
+    text += "└─────────────────────"
     await message.reply_text(text, parse_mode=ParseMode.HTML)
 
 
 # =====================================================
-# ðŸ”§ AUTO BACKUP TASK
+# 🔧 AUTO BACKUP TASK
 # =====================================================
 async def auto_backup_task():
     """Periodic auto-backup every 6 hours."""
@@ -5814,7 +5814,7 @@ async def auto_backup_task():
 
 
 # =====================================================
-# ðŸ”§ STALE TASK CLEANER
+# 🔧 STALE TASK CLEANER
 # =====================================================
 async def stale_task_cleaner():
     """Clean up stale campaign tasks and user states periodically."""
@@ -5861,7 +5861,7 @@ async def stale_task_cleaner():
 
 
 # =====================================================
-# ðŸ”§ HEALTH CHECK TASK
+# 🔧 HEALTH CHECK TASK
 # =====================================================
 async def health_check_task():
     """Periodic health check and reporting."""
@@ -5870,7 +5870,7 @@ async def health_check_task():
             await asyncio.sleep(3600)  # Every hour
             s = get_system_stats()
             logger.info(
-                f"ðŸ’€ Health | Users: {s['total_users']} | "
+                f"💀 Health | Users: {s['total_users']} | "
                 f"Sessions: {s['total_accounts']} | "
                 f"Running: {s['running']} | "
                 f"Tasks: {s['active_engine_tasks']} | "
@@ -5884,18 +5884,18 @@ async def health_check_task():
 
 
 # =====================================================
-# ðŸ MAIN EXECUTION
+# 🏁 MAIN EXECUTION
 # =====================================================
 async def start_bot():
     """Main bot startup function."""
     print("=" * 50)
-    print("ðŸ’€ SKULL ADS BOT v3.0")
+    print("💀 MARKETING BOT v3.0")
     print("=" * 50)
-    print(f"ðŸ“± API ID: {API_ID}")
-    print(f"ðŸ¤– Bot: @{BOT_USERNAME}")
-    print(f"ðŸ‘‘ Admins: {ADMIN_IDS}")
-    print(f"ðŸ’¾ Data File: {DATA_FILE}")
-    print(f"ðŸ“ž phonenumbers: {'âœ…' if PHONENUMBERS_AVAILABLE else 'âŒ (basic mode)'}")
+    print(f"📱 API ID: {API_ID}")
+    print(f"🤖 Bot: @{BOT_USERNAME}")
+    print(f"👑 Admins: {ADMIN_IDS}")
+    print(f"💾 Data File: {DATA_FILE}")
+    print(f"📞 phonenumbers: {'✅' if PHONENUMBERS_AVAILABLE else '❌ (basic mode)'}")
     print("=" * 50)
 
     # Increment start count
@@ -5910,26 +5910,26 @@ async def start_bot():
 
     try:
         me = await bot.get_me()
-        logger.info(f"âœ… @{me.username} is LIVE!")
-        print(f"âœ… @{me.username} is LIVE!")
+        logger.info(f"✅ @{me.username} is LIVE!")
+        print(f"✅ @{me.username} is LIVE!")
     except Exception as e:
         logger.error(f"Failed to get bot info: {e}")
-        print("âœ… Bot started but couldn't get info.")
+        print("✅ Bot started but couldn't get info.")
 
     # Start background tasks
-    logger.info("ðŸ”¥ Starting background tasks...")
+    logger.info("🔥 Starting background tasks...")
     asyncio.create_task(ad_engine())
     asyncio.create_task(auto_backup_task())
     asyncio.create_task(stale_task_cleaner())
     asyncio.create_task(health_check_task())
 
-    logger.info("âœ… All systems operational!")
+    logger.info("✅ All systems operational!")
     print("=" * 50)
-    print("ðŸ”¥ Bot is fully operational!")
-    print("ðŸ’€ Ad Engine: ACTIVE")
-    print("ðŸ’¾ Auto Backup: ACTIVE")
-    print("ðŸ§¹ Stale Cleaner: ACTIVE")
-    print("ðŸ¥ Health Check: ACTIVE")
+    print("🔥 Bot is fully operational!")
+    print("💀 Ad Engine: ACTIVE")
+    print("💾 Auto Backup: ACTIVE")
+    print("🧹 Stale Cleaner: ACTIVE")
+    print("🏥 Health Check: ACTIVE")
     print("=" * 50)
 
     # Notify admins
@@ -5938,17 +5938,17 @@ async def start_bot():
             s = get_system_stats()
             await bot.send_message(
                 admin_id,
-                f"ðŸ’€ <b>Bot Started Successfully!</b>\n\n"
-                f"â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n"
-                f"â”‚ ðŸ¤– <b>Version:</b> v{BOT_VERSION}\n"
-                f"â”‚ ðŸ‘¥ <b>Users:</b> <code>{s['total_users']}</code>\n"
-                f"â”‚ ðŸ”‘ <b>Sessions:</b> <code>{s['total_accounts']}</code>\n"
-                f"â”‚ ðŸš€ <b>Running:</b> <code>{s['running']}</code>\n"
-                f"â”‚ â±ï¸ <b>Start #:</b> <code>{s['bot_starts']}</code>\n"
-                f"â”‚ ðŸ’¾ <b>DB Size:</b> <code>{s['file_size_str']}</code>\n"
-                f"â”‚ ðŸ“ž <b>PhoneLib:</b> {'âœ…' if PHONENUMBERS_AVAILABLE else 'âŒ'}\n"
-                f"â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€\n\n"
-                f"All systems operational! âœ…",
+                f"💀 <b>Bot Started Successfully!</b>\n\n"
+                f"┌─────────────────────\n"
+                f"│ 🤖 <b>Version:</b> v{BOT_VERSION}\n"
+                f"│ 👥 <b>Users:</b> <code>{s['total_users']}</code>\n"
+                f"│ 🔑 <b>Sessions:</b> <code>{s['total_accounts']}</code>\n"
+                f"│ 🚀 <b>Running:</b> <code>{s['running']}</code>\n"
+                f"│ ⏱️ <b>Start #:</b> <code>{s['bot_starts']}</code>\n"
+                f"│ 💾 <b>DB Size:</b> <code>{s['file_size_str']}</code>\n"
+                f"│ 📞 <b>PhoneLib:</b> {'✅' if PHONENUMBERS_AVAILABLE else '❌'}\n"
+                f"└─────────────────────\n\n"
+                f"All systems operational! ✅",
                 parse_mode=ParseMode.HTML
             )
         except Exception as e:
@@ -5958,12 +5958,12 @@ async def start_bot():
 
     logger.info("Stopping bot...")
     await bot.stop()
-    logger.info("ðŸ’€ Bot stopped gracefully.")
-    print("ðŸ’€ Bot stopped.")
+    logger.info("💀 Bot stopped gracefully.")
+    print("💀 Bot stopped.")
 
 
 # =====================================================
-# ðŸš€ ENTRY POINT
+# 🚀 ENTRY POINT
 # =====================================================
 if __name__ == "__main__":
     try:
@@ -5978,7 +5978,7 @@ if __name__ == "__main__":
     try:
         loop.run_until_complete(start_bot())
     except KeyboardInterrupt:
-        print("\nðŸ’€ Bot stopped by user.")
+        print("\n💀 Bot stopped by user.")
     except Exception as e:
         logger.critical(f"Fatal error: {e}")
         traceback.print_exc()
